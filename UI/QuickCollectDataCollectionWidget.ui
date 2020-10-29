@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1280</width>
-    <height>711</height>
+    <height>710</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,52 +23,7 @@
     </rect>
    </property>
    <layout class="QGridLayout" name="mainGridLayout">
-    <item row="9" column="0">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Channels</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <layout class="QHBoxLayout" name="actionLabelContainer"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QGraphicsView" name="graphicsView"/>
-    </item>
-    <item row="7" column="0">
-     <widget class="QLabel" name="streamLabel">
-      <property name="text">
-       <string>Stream</string>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="0">
-     <layout class="QHBoxLayout" name="streamContainer">
-      <item>
-       <widget class="QPushButton" name="recButton">
-        <property name="text">
-         <string>Rec</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="startButton">
-        <property name="text">
-         <string>Start</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="stopButton">
-        <property name="text">
-         <string>Stop</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item row="10" column="0" rowspan="2">
+    <item row="11" column="0" rowspan="2">
      <layout class="QHBoxLayout" name="channelSelectContainer">
       <item>
        <widget class="QPushButton" name="channel1Button">
@@ -243,6 +198,22 @@
       </item>
      </layout>
     </item>
+    <item row="1" column="1">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="2">
+     <layout class="QHBoxLayout" name="actionLabelContainer"/>
+    </item>
     <item row="1" column="2">
      <layout class="QVBoxLayout" name="actionContainer">
       <item>
@@ -306,18 +277,75 @@
       </property>
      </spacer>
     </item>
-    <item row="1" column="1">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
+    <item row="7" column="0">
+     <widget class="QLabel" name="streamLabel">
+      <property name="text">
+       <string>Stream</string>
       </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QGraphicsView" name="graphicsView"/>
+    </item>
+    <item row="10" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Channels</string>
       </property>
-     </spacer>
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <layout class="QHBoxLayout" name="streamContainer">
+      <item>
+       <widget class="QPushButton" name="recButton">
+        <property name="text">
+         <string>Rec</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="startButton">
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="stopButton">
+        <property name="text">
+         <string>Stop</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="8" column="2">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Input Type</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButton">
+        <property name="text">
+         <string>DAQ</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButton_2">
+        <property name="text">
+         <string>File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBox_2"/>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

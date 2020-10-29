@@ -9,83 +9,18 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import pyqtgraph as pg
-from random import randint
-import struct
-import numpy as np
-import glob
-from MainWidgets.LiveMicWidget import LiveMicWidget
-from MainWidgets.CSVGraphWidget import CSVGraphWidget
-import matplotlib.pyplot as plt
 
 
-import random
-
-class Ui_QuickCollectDC(QtWidgets.QWidget):
-
+class Ui_Collection(object):
     def setupUi(self, Collection):
         Collection.setObjectName("Collection")
-        Collection.resize(1280, 711)
+        Collection.resize(1280, 710)
         self.layoutWidget = QtWidgets.QWidget(Collection)
         self.layoutWidget.setGeometry(QtCore.QRect(0, 0, 938, 513))
         self.layoutWidget.setObjectName("layoutWidget")
         self.mainGridLayout = QtWidgets.QGridLayout(self.layoutWidget)
-        self.mainGridLayout.setContentsMargins(30, 30, 30, 30)
+        self.mainGridLayout.setContentsMargins(0, 0, 0, 0)
         self.mainGridLayout.setObjectName("mainGridLayout")
-        self.label_2 = QtWidgets.QLabel(self.layoutWidget)
-        self.label_2.setObjectName("label_2")
-        self.mainGridLayout.addWidget(self.label_2, 9, 0, 1, 1)
-        self.actionLabelContainer = QtWidgets.QHBoxLayout()
-        self.actionLabelContainer.setObjectName("actionLabelContainer")
-        self.mainGridLayout.addLayout(self.actionLabelContainer, 0, 2, 1, 1)
-
-        #GRAPH
-        #Mic
-        self.liveView = LiveMicWidget()
-        #CSV
-        self.fileView = CSVGraphWidget()
-        self.fileView.hide()
-
-
-        self.liveView.setObjectName("liveView")
-        self.fileView.setObjectName("fileView")
-        self.mainGridLayout.addWidget(self.liveView, 1, 0, 1, 1)
-        self.mainGridLayout.addWidget(self.fileView, 1, 0, 1, 1)
-        self.streamLabel = QtWidgets.QLabel(self.layoutWidget)
-        self.streamLabel.setObjectName("streamLabel")
-        self.mainGridLayout.addWidget(self.streamLabel, 7, 0, 1, 1)
-        self.streamContainer = QtWidgets.QHBoxLayout()
-        self.streamContainer.setObjectName("streamContainer")
-        self.recButton = QtWidgets.QPushButton(self.layoutWidget)
-        self.recButton.setObjectName("recButton")
-        self.streamContainer.addWidget(self.recButton)
-        self.startButton = QtWidgets.QPushButton(self.layoutWidget)
-        self.startButton.setObjectName("startButton")
-        self.streamContainer.addWidget(self.startButton)
-        self.stopButton = QtWidgets.QPushButton(self.layoutWidget)
-        self.stopButton.setObjectName("stopButton")
-        self.streamContainer.addWidget(self.stopButton)
-        self.mainGridLayout.addLayout(self.streamContainer, 8, 0, 1, 1)
-        self.inputTypeContainer = QtWidgets.QVBoxLayout()
-        self.inputTypeContainer.setObjectName("inputTypeContainer")
-        self.label = QtWidgets.QLabel(self.layoutWidget)
-        self.label.setObjectName("inputTypeLabel")
-        self.label.setText('Input Type')
-        self.inputTypeContainer.addWidget(self.label)
-        self.DAQRadio = QtWidgets.QRadioButton(self.layoutWidget)
-        self.DAQRadio.setObjectName("DAQRadio")
-        self.DAQRadio.setText("DAQ")
-        self.DAQRadio.toggled.connect(lambda: self.inputRadioState(self.DAQRadio))
-        self.inputTypeContainer.addWidget(self.DAQRadio)
-        self.fileRadio = QtWidgets.QRadioButton(self.layoutWidget)
-        self.fileRadio.setObjectName("fileRadio")
-        self.fileRadio.setText("File")
-        self.fileRadio.toggled.connect(lambda: self.inputRadioState(self.fileRadio))
-        self.inputTypeContainer.addWidget(self.fileRadio)
-        self.inputDropdown = QtWidgets.QComboBox(self.layoutWidget)
-        self.inputDropdown.setObjectName("inputDropdown")
-        self.inputTypeContainer.addWidget(self.inputDropdown)
-        self.mainGridLayout.addLayout(self.inputTypeContainer, 8, 2, 1, 1)
         self.channelSelectContainer = QtWidgets.QHBoxLayout()
         self.channelSelectContainer.setObjectName("channelSelectContainer")
         self.channel1Button = QtWidgets.QPushButton(self.layoutWidget)
@@ -133,7 +68,12 @@ class Ui_QuickCollectDC(QtWidgets.QWidget):
         self.channelAllButton.setMaximumSize(QtCore.QSize(50, 50))
         self.channelAllButton.setObjectName("channelAllButton")
         self.channelSelectContainer.addWidget(self.channelAllButton)
-        self.mainGridLayout.addLayout(self.channelSelectContainer, 10, 0, 2, 1)
+        self.mainGridLayout.addLayout(self.channelSelectContainer, 11, 0, 2, 1)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.mainGridLayout.addItem(spacerItem, 1, 1, 1, 1)
+        self.actionLabelContainer = QtWidgets.QHBoxLayout()
+        self.actionLabelContainer.setObjectName("actionLabelContainer")
+        self.mainGridLayout.addLayout(self.actionLabelContainer, 0, 2, 1, 1)
         self.actionContainer = QtWidgets.QVBoxLayout()
         self.actionContainer.setObjectName("actionContainer")
         self.selectActionContainer = QtWidgets.QHBoxLayout()
@@ -159,27 +99,51 @@ class Ui_QuickCollectDC(QtWidgets.QWidget):
         self.graphicsView_2.setObjectName("graphicsView_2")
         self.actionContainer.addWidget(self.graphicsView_2)
         self.mainGridLayout.addLayout(self.actionContainer, 1, 2, 1, 1)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.mainGridLayout.addItem(spacerItem, 2, 0, 1, 3)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.mainGridLayout.addItem(spacerItem1, 1, 1, 1, 1)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.mainGridLayout.addItem(spacerItem1, 2, 0, 1, 3)
+        self.streamLabel = QtWidgets.QLabel(self.layoutWidget)
+        self.streamLabel.setObjectName("streamLabel")
+        self.mainGridLayout.addWidget(self.streamLabel, 7, 0, 1, 1)
+        self.graphicsView = QtWidgets.QGraphicsView(self.layoutWidget)
+        self.graphicsView.setObjectName("graphicsView")
+        self.mainGridLayout.addWidget(self.graphicsView, 1, 0, 1, 1)
+        self.label_2 = QtWidgets.QLabel(self.layoutWidget)
+        self.label_2.setObjectName("label_2")
+        self.mainGridLayout.addWidget(self.label_2, 10, 0, 1, 1)
+        self.streamContainer = QtWidgets.QHBoxLayout()
+        self.streamContainer.setObjectName("streamContainer")
+        self.recButton = QtWidgets.QPushButton(self.layoutWidget)
+        self.recButton.setObjectName("recButton")
+        self.streamContainer.addWidget(self.recButton)
+        self.startButton = QtWidgets.QPushButton(self.layoutWidget)
+        self.startButton.setObjectName("startButton")
+        self.streamContainer.addWidget(self.startButton)
+        self.stopButton = QtWidgets.QPushButton(self.layoutWidget)
+        self.stopButton.setObjectName("stopButton")
+        self.streamContainer.addWidget(self.stopButton)
+        self.mainGridLayout.addLayout(self.streamContainer, 8, 0, 1, 1)
+        self.inputTypeContainer = QtWidgets.QVBoxLayout()
+        self.inputTypeContainer.setObjectName("inputTypeContainer")
+        self.label = QtWidgets.QLabel(self.layoutWidget)
+        self.label.setObjectName("inputTypeLabel")
+        self.inputTypeContainer.addWidget(self.label)
+        self.DAQRadio = QtWidgets.QRadioButton(self.layoutWidget)
+        self.DAQRadio.setObjectName("DAQRadio")
+        self.inputTypeContainer.addWidget(self.DAQRadio)
+        self.fileRadio = QtWidgets.QRadioButton(self.layoutWidget)
+        self.fileRadio.setObjectName("fileRadio")
+        self.inputTypeContainer.addWidget(self.fileRadio)
+        self.inputDropdown = QtWidgets.QComboBox(self.layoutWidget)
+        self.inputDropdown.setObjectName("inputDropdown")
+        self.inputTypeContainer.addWidget(self.inputDropdown)
+        self.mainGridLayout.addLayout(self.inputTypeContainer, 8, 2, 1, 1)
 
         self.retranslateUi(Collection)
         QtCore.QMetaObject.connectSlotsByName(Collection)
 
-        #Button Handling
-        self.recButton.clicked.connect(self.handleRecButtonPress)
-        self.startButton.clicked.connect(self.handleStartButton)
-        self.stopButton.clicked.connect(self.handleStopButton)
-
     def retranslateUi(self, Collection):
         _translate = QtCore.QCoreApplication.translate
         Collection.setWindowTitle(_translate("Collection", "Form"))
-        self.label_2.setText(_translate("Collection", "Channels"))
-        self.streamLabel.setText(_translate("Collection", "Stream"))
-        self.recButton.setText(_translate("Collection", "Rec"))
-        self.startButton.setText(_translate("Collection", "Start"))
-        self.stopButton.setText(_translate("Collection", "Stop"))
         self.channel1Button.setText(_translate("Collection", "1"))
         self.channel2Button.setText(_translate("Collection", "2"))
         self.channel3Button.setText(_translate("Collection", "3"))
@@ -191,50 +155,21 @@ class Ui_QuickCollectDC(QtWidgets.QWidget):
         self.channelAllButton.setText(_translate("Collection", "All"))
         self.featureLabel.setText(_translate("Collection", "Feature"))
         self.timeStepLabel.setText(_translate("Collection", "Time Step"))
-    def handleRecButtonPress(self):
-        print('Rec Button pressed')
-    def handleStartButton(self):
-        if self.DAQRadio.isChecked() == True:
-            self.liveView.handleStart()
-
-        if self.fileRadio.isChecked() == True:
-            self.fileView.setInput(self.inputDropdown.currentText())
-            self.fileView.handleStart()
-
-    def handleStopButton(self):
-        print('Stop Button pressed')
-        if self.DAQRadio.isChecked() == True:
-            self.liveView.handleStop()
-
-        if self.fileRadio.isChecked() == True:
-            self.fileView.handleStop()
-
-    def inputRadioState(self, b):
-        if b.text() == "DAQ":
-            if b.isChecked() == True:
-                self.fileView.hide()
-                self.liveView.show()
-                self.inputDropdown.clear()
-                self.inputDropdown.addItem("Mic")
-
-        if b.text() == "File":
-            if b.isChecked() == True:
-                self.liveView.hide()
-                self.fileView.show()
-                self.inputDropdown.clear()
-                for file in glob.glob("Data/*.csv"):
-                    print(file)
-                    self.inputDropdown.addItem(file)
-
-        print('end')
-
+        self.streamLabel.setText(_translate("Collection", "Stream"))
+        self.label_2.setText(_translate("Collection", "Channels"))
+        self.recButton.setText(_translate("Collection", "Rec"))
+        self.startButton.setText(_translate("Collection", "Start"))
+        self.stopButton.setText(_translate("Collection", "Stop"))
+        self.label.setText(_translate("Collection", "Input Type"))
+        self.radioButton.setText(_translate("Collection", "DAQ"))
+        self.radioButton_2.setText(_translate("Collection", "File"))
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Collection = QtWidgets.QWidget()
-    ui = Ui_QuickCollectDC()
+    ui = Ui_Collection()
     ui.setupUi(Collection)
     Collection.show()
     sys.exit(app.exec_())
