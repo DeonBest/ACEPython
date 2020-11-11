@@ -2,3 +2,4 @@ venv
 .idea
 MainWidgets/__pycache__
 MainWidgets/.DS_Store
+UI/.DS_Store
