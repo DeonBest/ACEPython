@@ -1,9 +1,9 @@
 import numpy as np
 from PyQt5 import QtGui, QtCore, QtWidgets
 import pyqtgraph as pg
-
-
-class CSVGraphWidget(QtWidgets.QWidget):
+from MainWidgets.ReaderPlotWidget import ReaderPlotWidget
+import abc
+class CSVGraphWidget(QtWidgets.QWidget, ReaderPlotWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 

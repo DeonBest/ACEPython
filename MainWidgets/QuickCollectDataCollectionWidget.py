@@ -17,6 +17,7 @@ import glob
 from MainWidgets.LiveMicWidget import LiveMicWidget
 from MainWidgets.CSVGraphWidget import CSVGraphWidget
 from MainWidgets.LiveRandom import LiveRandom
+from MainWidgets.ReaderPlotWidget import ReaderPlotWidget
 import matplotlib.pyplot as plt
 import pyrealtime as prt
 

@@ -2,6 +2,7 @@ import numpy as np
 
 from PyQt5 import QtGui, QtCore
 from MainWidgets.MicRecorder import MicrophoneRecorder
+from MainWidgets.ReaderPlotWidget import ReaderPlotWidget
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
@@ -12,7 +13,7 @@ class MplFigure(object):
         self.canvas = FigureCanvas(self.figure)
         self.toolbar = NavigationToolbar(self.canvas, parent)
 
-class LiveMicWidget(QtGui.QWidget):
+class LiveMicWidget(QtGui.QWidget, ReaderPlotWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 
