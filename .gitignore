@@ -1,5 +1,6 @@
 venv
 .idea
+PlotWidget/__pycache__
 MainWidgets/__pycache__
 MainWidgets/.DS_Store
 UI/.DS_Store
