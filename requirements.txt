@@ -1,1 +1,4 @@
-PyQt5~=5.15.1
+requests
+beautifulsoup4
+numpy
+lxml
