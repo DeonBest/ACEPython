@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+  </head>
+  <body>
+    <h1>Hello Python!</h1>
+    <button onclick="test()" href="http://127.0.0.1:5000/">Go</button>
+  
+
+    <script>
+      // You can also require other files to run in this process
+      require('./renderer.js')
+/*       fetch('http://127.0.0.1:5000/')
+      .then(function (response) {
+          console.log(response);
+      }).then(function (text) {
+          console.log('GET response:');
+          console.log(text.greeting); 
+      }); */
+      function test(){
+        fetch('http://127.0.0.1:5000/')
+        .then(response => response.json())
+        .then(data => console.log(data));
+      }
+    </script>
+  </body>
+</html>

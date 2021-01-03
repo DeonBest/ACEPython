@@ -27,9 +27,6 @@
   <link rel="stylesheet" href="../styles/quickCollectStyles.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
-  <!--Linkers-->
-  <script src="../linkers/quickCollect.js"></script>
-  <!--Linkers-->
 
   <script type="text/javascript">
     $(function () {
@@ -39,9 +36,35 @@
       $("#chart2").load("../components/featurePlot.html");
       //Initialize dropdowns
       //Files
-      getDataFiles();
+      //getDataFiles();
+      fetch('http://127.0.0.1:5000/datafiles')
+        .then(response => response.json())
+        .then(data_files => {
+          for (i = 0; i < data_files.length; i++) {
+          const split = data_files[i].split("/");
+          file_name = split[split.length - 1];
+          $("#file-select").append(
+            $("<option>", {
+              value: data_files[i],
+              text: file_name,
+            })
+          );
+        }
+        });
 
     });
+
+    function onFileSelect() {
+    //set radio to file and enable the file selector
+    $("#file-select").attr("disabled", false);
+    $("#input-type-live").attr("checked", false);
+  }
+
+  function onLiveSelect() {
+    //set radio to live and disable the file selector
+    $("#file-select").attr("disabled", true);
+    $("#input-type-file").attr("checked", false);
+  }
   </script>
 
 </head>

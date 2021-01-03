@@ -1,12 +1,14 @@
-const electron = require("electron");
-// Module to control application life.
-const app = electron.app;
-// Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow;
+// Modules to control application life and create native browser window
+const { app, BrowserWindow } = require("electron");
+// import {PythonShell} from 'python-shell';
 
-const path = require("path");
-const url = require("url");
-require = require("esm")(module);
+const { PythonShell } = require("python-shell");
+
+PythonShell.runString("x=1+1;print(x)", null, function (err) {
+  if (err) throw err;
+  console.log("finished");
+});
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -20,29 +22,19 @@ if (env === "development") {
   } catch (e) {
     console.log(e);
   }
-} 
-
-const u = require("uuid");
-console.log("U", u.v4());
+}
 
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 1000,
-    webPreferences: {
-      nodeIntegration: true,
-    },
+  mainWindow = new BrowserWindow({ width: 800, height: 600 });
+
+  PythonShell.run("backend/engine.py", null, function (err) {
+    if (err) throw err;
+    console.log("finished engine");
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(
-    url.format({
-      pathname: path.join(__dirname, "/frontend/pages/quickcollect.html"),
-      protocol: "file:",
-      slashes: true,
-    })
-  );
+  mainWindow.loadFile("frontend/pages/quickcollect.html");
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
@@ -63,14 +55,15 @@ app.on("ready", createWindow);
 
 // Quit when all windows are closed.
 app.on("window-all-closed", function () {
-  // On OS X it is common for applications and their menu bar
+  // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-
-  app.quit();
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
 
 app.on("activate", function () {
-  // On OS X it's common to re-create a window in the app when the
+  // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
     createWindow();

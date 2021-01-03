@@ -1,25 +1,27 @@
 {
-  "name": "ACEPython",
+  "name": "electron-quick-start",
   "version": "1.0.0",
-  "description": "ACE Tool built with electron backed by python",
+  "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
+  "repository": "",
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
+  "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "electron": "^11.0.4",
-    "electron-rebuild": "^2.3.4",
+    "electron": "^3.0.7",
     "electron-reload": "^1.5.0",
     "electron-reloader": "^1.1.0"
   },
   "dependencies": {
-    "babel-preset-electron": "^1.4.15",
-    "esm": "^3.2.25",
-    "plotly": "^1.0.6",
-    "python-shell": "^1.0.7",
-    "uuid": "^8.3.1"
+    "python-shell": "^1.0.6"
   }
 }
