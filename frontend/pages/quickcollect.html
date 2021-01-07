@@ -37,9 +37,11 @@
       //Initialize dropdowns
       //Files
       //getDataFiles();
-      fetch('http://127.0.0.1:5000/datafiles')
+      setTimeout(()=>{
+        fetch('http://127.0.0.1:5000/datafiles')
         .then(response => response.json())
         .then(data_files => {
+          console.log(data_files)
           for (i = 0; i < data_files.length; i++) {
           const split = data_files[i].split("/");
           file_name = split[split.length - 1];
@@ -51,6 +53,8 @@
           );
         }
         });
+      }, 1000)
+
 
     });
 
@@ -104,7 +108,7 @@
         <div class='streamContainer'>
           <button type="button" class="btn btn-secondary">Record</button>
           <button type="button" class="btn btn-secondary" onclick="onStart()">Start</button>
-          <button type="button" class="btn btn-secondary">Stop</button>
+          <button type="button" class="btn btn-secondary" id='stopBtn'>Stop</button>
         </div>
       </div>
       <div class="section">
