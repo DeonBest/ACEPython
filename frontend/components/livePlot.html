@@ -1,4 +1,89 @@
 <script type="text/javascript">
+  var csvdata = [];
+  var featuredata = [];
+  var options = {
+    series: [
+      {
+        data: csvdata.slice(),
+      },
+    ],
+    chart: {
+      id: "realtime",
+      height: 450,
+      type: "line",
+      animations: {
+        enabled: false,
+      },
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: "smooth",
+      width: "1",
+    },
+    markers: {
+      size: 0,
+    },
+    xaxis: {
+      type: "numeric",
+      labels: {
+        show: false,
+        //hideOverlappingLabels: true,
+      },
+      tickAmount: "200",
+    },
+    yaxis: {
+      max: 0.2,
+      min: -0.2,
+      labels: {
+        formatter: (val) => {
+          return val.toFixed(2);
+        },
+      },
+      axisBorder: {
+        show: true,
+        color: "#78909C",
+        offsetX: 0,
+        offsetY: 0,
+      },
+      axisTicks: {
+        show: true,
+        borderType: "solid",
+        color: "#78909C",
+        width: 6,
+        offsetX: 0,
+        offsetY: 0,
+      },
+    },
+    grid: {
+      show: true,
+      borderColor: "black",
+      borderWidth: 1,
+      position: "front",
+      yaxis: {
+        lines: {
+          show: true,
+        },
+      },
+      xaxis: {
+        lines: {
+          show: true,
+        },
+      },
+    },
+    legend: {
+      show: false,
+    },
+  };
+  var chart = new ApexCharts(document.querySelector("#liveChart"), options);
+
   function onStart() {
     // This function is an accurate interval function
     function AdjustingInterval(workFunc, interval, errorFunc) {
@@ -26,29 +111,12 @@
         timeout = setTimeout(step, Math.max(0, that.interval - drift));
       }
     }
+
     var ticker = null;
     $("#stopBtn").click(function () {
-      console.log("stop");
       if (ticker != null) {
         ticker.stop();
       }
-    });
-
-    const el = document.getElementById("chart");
-    let csvdata = [];
-    const chart = new TimeChart(el, {
-      // debugWebGL: true,
-      // forceWebGL1: true,
-      series: [
-        {
-          name: "Data",
-          data: csvdata,
-        },
-      ],
-      xRange: { min: 0, max: 1000 },
-      yRange: { min: -0.2, max: 0.2 },
-      realTime: true,
-      paddingLeft: 0,
     });
 
     if ($("#input-type-live").is(":checked")) {
@@ -73,13 +141,27 @@
         .then((result) => {
           var startTime = performance.now();
           function doWork() {
+            if (csvdata.length > 400) {
+              csvdata.splice(0, FRAME_SIZE);
+            }
+            if (frame % 10 == 0) {
+              onNewFeatureData(featuredata);
+              featuredata = [];
+            }
             const newData = result.splice(0, FRAME_SIZE);
-            const newDataFormatted = newData.map((d, i) => {
+            /*  const newDataFormatted = newData.map((d, i) => {
               //if (frame * FRAME_SIZE > 1000) csvdata.shift();
               csvdata.push({ x: i + frame * FRAME_SIZE, y: d });
-            });
-            chart.update();
+            }); */
+            csvdata = csvdata.concat(newData);
+            featuredata = featuredata.concat(newData);
+            chart.updateSeries([
+              {
+                data: csvdata,
+              },
+            ]);
             frame++;
+            console.log(frame);
           }
           ticker = new AdjustingInterval(doWork, FRAME_SIZE);
           ticker.start();
@@ -87,33 +169,9 @@
     }
   }
   $(document).ready(function () {
-    /*  const el = document.getElementById("chart");
-    const dataSin = [];
-    const chart = new TimeChart(el, {
-      // debugWebGL: true,
-      // forceWebGL1: true,
-      baseTime: Date.now() - performance.now(),
-      series: [
-        {
-          name: "Data",
-          data: dataSin,
-        },
-      ],
-      xRange: { min: 0, max: 20 * 1000 },
-      realTime: true,
-      zoom: {
-        x: {
-          autoRange: true,
-          minDomainExtent: 50,
-        },
-        y: {
-          autoRange: true,
-          minDomainExtent: 1,
-        },
-      },
-    }); */
+    chart.render();
   });
 </script>
 <!--end polot-->
 
-<div id="chart" width="200" height="200" backgroundColor="red"></div>
+<div id="liveChart" width="200" height="200" backgroundColor="red"></div>
