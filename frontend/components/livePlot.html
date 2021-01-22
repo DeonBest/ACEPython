@@ -1,88 +1,70 @@
 <script type="text/javascript">
   var csvdata = [];
+  var labels = [];
   var featuredata = [];
-  var options = {
-    series: [
-      {
-        data: csvdata.slice(),
+  ctx = document.getElementById("liveChart");
+  var myLineChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: new Array(500).fill(0),
+      datasets: [
+        {
+          data: csvdata,
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "black",
+          fill: false,
+        },
+      ],
+    },
+    options: {
+      animation: {
+        duration: 0, // general animation time
       },
-    ],
-    chart: {
-      id: "realtime",
-      height: 450,
-      type: "line",
-      animations: {
+      elements: {
+        line: {
+          tension: 0, // disables bezier curves
+        },
+      },
+      hover: {
+        animationDuration: 0, // duration of animations when hovering an item
+      },
+      legend: {
+        display: false,
+      },
+      tooltip: {
         enabled: false,
       },
-      toolbar: {
-        show: false,
-      },
-      zoom: {
-        enabled: false,
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      curve: "smooth",
-      width: "1",
-    },
-    markers: {
-      size: 0,
-    },
-    xaxis: {
-      type: "numeric",
-      labels: {
-        show: false,
-        //hideOverlappingLabels: true,
-      },
-      tickAmount: "200",
-    },
-    yaxis: {
-      max: 0.2,
-      min: -0.2,
-      labels: {
-        formatter: (val) => {
-          return val.toFixed(2);
+      layout: {
+        padding: {
+          left: 0,
+          right: 10,
+          top: 50,
+          bottom: 0,
         },
       },
-      axisBorder: {
-        show: true,
-        color: "#78909C",
-        offsetX: 0,
-        offsetY: 0,
-      },
-      axisTicks: {
-        show: true,
-        borderType: "solid",
-        color: "#78909C",
-        width: 6,
-        offsetX: 0,
-        offsetY: 0,
-      },
-    },
-    grid: {
-      show: true,
-      borderColor: "black",
-      borderWidth: 1,
-      position: "front",
-      yaxis: {
-        lines: {
-          show: true,
-        },
-      },
-      xaxis: {
-        lines: {
-          show: true,
-        },
+      responsiveAnimationDuration: 0, // animation duration after a resize
+      scales: {
+        xAxes: [
+          {
+            display: false,
+          },
+        ],
+        yAxes: [
+          {
+            display: true,
+            scaleLabel: {
+              display: true,
+            },
+            ticks: {
+              suggestedMin: -0.08,
+              suggestedMax: 0.08,
+            },
+          },
+        ],
       },
     },
-    legend: {
-      show: false,
-    },
-  };
-  var chart = new ApexCharts(document.querySelector("#liveChart"), options);
+  });
 
   function onStart() {
     // This function is an accurate interval function
@@ -143,35 +125,33 @@
           function doWork() {
             if (csvdata.length > 400) {
               csvdata.splice(0, FRAME_SIZE);
+              labels.splice(0, FRAME_SIZE);
             }
+            //Feature
             if (frame % 10 == 0) {
               onNewFeatureData(featuredata);
               featuredata = [];
             }
             const newData = result.splice(0, FRAME_SIZE);
-            /*  const newDataFormatted = newData.map((d, i) => {
+            const newDataFormatted = newData.map((d, i) => {
               //if (frame * FRAME_SIZE > 1000) csvdata.shift();
               csvdata.push({ x: i + frame * FRAME_SIZE, y: d });
-            }); */
-            csvdata = csvdata.concat(newData);
+              labels.push(i + frame * FRAME_SIZE);
+            });
+            //csvdata = csvdata.concat(newData);
+            myLineChart.data.datasets[0].data = csvdata;
+            myLineChart.data.labels = labels;
+            myLineChart.update();
             featuredata = featuredata.concat(newData);
-            chart.updateSeries([
-              {
-                data: csvdata,
-              },
-            ]);
+
             frame++;
-            console.log(frame);
           }
           ticker = new AdjustingInterval(doWork, FRAME_SIZE);
           ticker.start();
         });
     }
   }
-  $(document).ready(function () {
-    chart.render();
-  });
 </script>
 <!--end polot-->
 
-<div id="liveChart" width="200" height="200" backgroundColor="red"></div>
+<canvas id="liveChart"></canvas>

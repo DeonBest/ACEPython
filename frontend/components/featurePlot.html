@@ -1,82 +1,62 @@
 <script type="text/javascript">
   var plotdata = [];
-  var options = {
-    series: [
-      {
-        data: csvdata.slice(),
-      },
-    ],
-    chart: {
-      id: "realtime",
-      height: 350,
-      type: "line",
-      animations: {
-        enabled: false,
-      },
-      toolbar: {
-        show: false,
-      },
-      zoom: {
-        enabled: false,
-      },
+  var labeldata = [];
+  ctx = document.getElementById("featurePlot");
+  var myFeaturePlot = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: new Array(500).fill(0),
+      datasets: [
+        {
+          data: plotdata,
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "black",
+          fill: false,
+        },
+      ],
     },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      curve: "smooth",
-      width: "1",
-    },
-    markers: {
-      size: 0,
-    },
-    xaxis: {
-      type: "numeric",
-      labels: {
-        show: false,
-        //hideOverlappingLabels: true,
+    options: {
+      animation: {
+        duration: 0, // general animation time
       },
-      tickAmount: "200",
-      axisBorder: {
-        show: true,
-        color: "#78909C",
-        height: 1,
-        width: "100%",
-        offsetX: 0,
-        offsetY: 0,
-      },
-    },
-    grid: {
-      show: true,
-      borderColor: "black",
-      borderWidth: 1,
-      position: "front",
-      row: {
-        colors: ["#e5e5e5", "transparent"],
-        opacity: 0.5,
-      },
-      column: {
-        colors: ["#f8f8f8", "transparent"],
-      },
-      yaxis: {
-        lines: {
-          show: true,
+      elements: {
+        line: {
+          tension: 0, // disables bezier curves
         },
       },
-      xaxis: {
-        lines: {
-          show: true,
+      hover: {
+        animationDuration: 0, // duration of animations when hovering an item
+      },
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+      layout: {
+        padding: {
+          bottom: 30,
         },
       },
+      responsiveAnimationDuration: 0, // animation duration after a resize
+      scales: {
+        xAxes: [
+          {
+            display: false,
+          },
+        ],
+        yAxes: [
+          {
+            display: true,
+            scaleLabel: {
+              display: true,
+            },
+          },
+        ],
+      },
     },
-    legend: {
-      show: false,
-    },
-  };
-  var featureChart = new ApexCharts(
-    document.querySelector("#featurePlot"),
-    options
-  );
+  });
 
   function average(array) {
     return (average = (array) =>
@@ -84,18 +64,20 @@
   }
 
   function onNewFeatureData(data) {
-    console.log(average(data));
-    plotdata.push(average(data));
-
-    featureChart.updateSeries([
-      {
-        data: plotdata,
-      },
-    ]);
+    if ($("#feature-select option:selected").text() !== "None" && data.length) {
+      const featureFunction = features.find(
+        (feature) => feature.name == $("#feature-select option:selected").text()
+      );
+      if (featureFunction) {
+        plotdata.push(featureFunction.calculate(data));
+        labeldata.push([...plotdata.keys()]);
+        myFeaturePlot.data.datasets[0].data = plotdata;
+        myFeaturePlot.data.labels = labeldata;
+        myFeaturePlot.update();
+      } else {
+        showToast("Error finding feature function");
+      }
+    }
   }
-
-  $(document).ready(function () {
-    featureChart.render();
-  });
 </script>
-<div id="featurePlot" width="400" height="400"></div>
+<canvas id="featurePlot"></canvas>
