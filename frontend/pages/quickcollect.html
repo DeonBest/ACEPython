@@ -30,6 +30,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
   <script src="../javascript/features.js"></script>
   <script src="../javascript/toast.js"></script>
+  <script src="../javascript/quickcollect.js"></script>
   <script type="text/javascript">
     /*
           Run this function on load
@@ -64,7 +65,6 @@
             }
           });
         //Features
-        console.log(features);
         features.forEach((feature, index) => {
           $("#feature-select").append(
             $("<option>", {
@@ -114,10 +114,10 @@
             <div>Time Step</div>
             <div>
               <input
-                type="text"
+                type="number"
                 class="form-control"
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
+                id="time-step"
+                aria-describedby="timeStepIn"
               />
             </div>
           </div>
@@ -186,15 +186,87 @@
               <h4>Channels</h4>
             </div>
             <div class="streamContainer">
-              <button type="button" class="btn btn-secondary">1</button>
-              <button type="button" class="btn btn-secondary">2</button>
-              <button type="button" class="btn btn-secondary">3</button>
-              <button type="button" class="btn btn-secondary">4</button>
-              <button type="button" class="btn btn-secondary">5</button>
-              <button type="button" class="btn btn-secondary">6</button>
-              <button type="button" class="btn btn-secondary">7</button>
-              <button type="button" class="btn btn-secondary">8</button>
-              <button type="button" class="btn btn-secondary">All</button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                id="qc-channel-1"
+                onclick="onChannelToggle(1)"
+                active="true"
+              >
+                1
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="qc-channel-2"
+                onclick="onChannelToggle(2)"
+                active="false"
+              >
+                2
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="qc-channel-3"
+                onclick="onChannelToggle(3)"
+                active="false"
+              >
+                3
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="qc-channel-4"
+                onclick="onChannelToggle(4)"
+                active="false"
+              >
+                4
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="qc-channel-5"
+                onclick="onChannelToggle(5)"
+                active="false"
+              >
+                5
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="qc-channel-6"
+                onclick="onChannelToggle(6)"
+                active="false"
+              >
+                6
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="qc-channel-7"
+                onclick="onChannelToggle(7)"
+                active="false"
+              >
+                7
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="qc-channel-8"
+                onclick="onChannelToggle(8)"
+                active="false"
+              >
+                8
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="qc-channel-all"
+                onclick="onChannelToggle('all')"
+                active="false"
+              >
+                All
+              </button>
             </div>
           </div>
           <div class="col"></div>

@@ -118,6 +118,7 @@
       var FRAME_SIZE = 100;
       var ms = 0;
       const file = $("#file-select option:selected").text();
+      const featureFrame = ($("#time-step").val() * 1000) / FRAME_SIZE;
       fetch("http://127.0.0.1:5000/readcsv/" + file)
         .then((response) => response.json())
         .then((result) => {
@@ -128,7 +129,8 @@
               labels.splice(0, FRAME_SIZE);
             }
             //Feature
-            if (frame % 10 == 0) {
+
+            if (frame % featureFrame == 0) {
               onNewFeatureData(featuredata);
               featuredata = [];
             }
