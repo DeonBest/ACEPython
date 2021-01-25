@@ -1,0 +1,66 @@
+<style>
+  .action-list-item {
+    display: flex;
+    flex-direction: row;
+  }
+  .action-list-field-sm {
+    flex: 0.1;
+  }
+  .action-list-field-md {
+    flex: 2;
+  }
+  .action-list-field-lg {
+    flex: 3;
+    padding-left: 5px;
+  }
+  input[type="number"] {
+    width: 80px;
+  }
+</style>
+
+<ul class="list-group" style="max-height: 40vh; overflow-y: scroll">
+  <li class="list-group-item">
+    <div class="action-list-item">
+      <div class="action-list-field-sm"></div>
+      <div class="action-list-field-lg">Action</div>
+      <div class="action-list-field-md">
+        <div style="padding-left: 20px">Reps</div>
+      </div>
+      <div class="action-list-field-md">
+        <div style="float: right; padding-right: 20px">Status</div>
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">
+    <div class="action-list-item">
+      <div class="action-list-field-sm">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          value=""
+          id="flexCheckDisabled"
+        />
+      </div>
+      <div class="action-list-field-lg">Open Hand</div>
+      <div class="action-list-field-md">
+        <input
+          type="number"
+          class="form-control form-control-sm"
+          id="action-reps"
+          aria-describedby="repsIn"
+        />
+      </div>
+      <div class="action-list-field-md" style="float: right">
+        <input
+          style="float: right"
+          type="number"
+          class="form-control form-control-sm"
+          id="action-status"
+          aria-describedby="actionStatus"
+        />
+      </div>
+    </div>
+  </li>
+  <li class="list-group-item">Dapibus ac facilisis in</li>
+  <li class="list-group-item">Morbi leo risus</li>
+</ul>

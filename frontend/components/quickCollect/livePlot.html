@@ -1,7 +1,9 @@
 <script type="text/javascript">
   var csvdata = [];
+  var data = [];
   var labels = [];
   var featuredata = [];
+  var FRAME_SIZE = 100;
   ctx = document.getElementById("liveChart");
   var myLineChart = new Chart(ctx, {
     type: "line",
@@ -102,20 +104,42 @@
     });
 
     if ($("#input-type-live").is(":checked")) {
-      setInterval(async function () {
+      var i = 0;
+      var frame = 0;
+      const featureFrame = ($("#time-step").val() * 1000) / FRAME_SIZE;
+      function doWork() {
         fetch("http://127.0.0.1:5000/readarr")
           .then((response) => response.json())
           .then((result) => {
-            myLineChart.data.datasets.forEach((dataset) => {
-              dataset.data.shift();
-              dataset.data.push(result);
-            });
+            console.log("R", result);
+            if (data.length > 400) {
+              data.splice(0, FRAME_SIZE);
+              labels.splice(0, FRAME_SIZE);
+            }
+            //Feature
+            console.log(frame, featureFrame);
+            if (frame % featureFrame == 0) {
+              console.log("feature", featuredata);
+              onNewFeatureData(featuredata);
+              featuredata = [];
+            }
+            data.push({ x: i, y: result });
+            labels.push(i * FRAME_SIZE);
+
+            //csvdata = csvdata.concat(newData);
+            featuredata.push(result);
+            myLineChart.data.datasets[0].data = data;
+            myLineChart.data.labels = labels;
             myLineChart.update();
+            i++;
+            frame++;
           });
-      }, 100);
+      }
+      ticker = new AdjustingInterval(doWork, FRAME_SIZE);
+      ticker.start();
     } else if ($("#input-type-file").is(":checked")) {
       var frame = 0;
-      var FRAME_SIZE = 100;
+
       var ms = 0;
       const file = $("#file-select option:selected").text();
       const featureFrame = ($("#time-step").val() * 1000) / FRAME_SIZE;

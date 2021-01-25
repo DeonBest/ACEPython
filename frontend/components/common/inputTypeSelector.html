@@ -1,0 +1,76 @@
+<script type='text/javascript'>
+$(function () {
+
+      /*
+            Populate Dropdowns/Fetch Data
+          */
+
+      setTimeout(() => {
+        //CSV Files
+        fetch("http://127.0.0.1:5000/datafiles")
+          .then((response) => response.json())
+          .then((data_files) => {
+            console.log(data_files);
+            for (i = 0; i < data_files.length; i++) {
+              const split = data_files[i].split("/");
+              file_name = split[split.length - 1];
+              $("#file-select").append(
+                $("<option>", {
+                  value: data_files[i],
+                  text: file_name,
+                })
+              );
+            }
+          });
+
+      }, 1000);
+    });
+
+  
+function onFileSelect() {
+    //set radio to file and enable the file selector
+    $("#file-select").attr("disabled", false);
+    $("#input-type-live").attr("checked", false);
+  }
+
+  function onLiveSelect() {
+    //set radio to live and disable the file selector
+    $("#file-select").attr("disabled", true);
+    $("#input-type-file").attr("checked", false);
+  }
+</script>
+<div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      name="flexRadioDefault"
+      id="input-type-live"
+      checked
+      onclick="onLiveSelect()"
+    />
+    <label class="form-check-label" for="flexRadioDefault2">
+      Live
+    </label>
+  </div>
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      name="flexRadioDefault"
+      id="input-type-file"
+      onclick="onFileSelect()"
+    />
+    <label class="form-check-label" for="flexRadioDefault1">
+      File
+    </label>
+  </div>
+
+  <select
+    id="file-select"
+    class="form-select"
+    aria-label="Default select example"
+    disabled
+  >
+    <option selected>File</option>
+  </select>
+</div>

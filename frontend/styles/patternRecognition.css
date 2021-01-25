@@ -1,0 +1,41 @@
+.window {
+  top: 60px; /* Header Height */
+  bottom: 10px; /* Footer Height */
+  width: 100%;
+}
+
+.col {
+  min-width: 0;
+}
+
+.container {
+  display: flex;
+  max-width: 90%;
+  margin: 5px;
+  flex: 1;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.collectionSettingsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 5px;
+  border: solid #000;
+  border-width: 1px 1px;
+  margin: 20px;
+}
+
+.promptViewContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 5px;
+  border: solid #000;
+  border-width: 1px 1px;
+  margin: 20px;
+}

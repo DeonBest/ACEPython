@@ -1,0 +1,28 @@
+.featureContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 20px;
+}
+
+.streamContainer {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 5px;
+  border: solid #000;
+  border-width: 1px 1px;
+  margin: 20px;
+}
+
+.inputTypeContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  border: solid #000;
+  padding: 10px;
+  border-width: 1px 1px;
+  margin: 20px;
+}

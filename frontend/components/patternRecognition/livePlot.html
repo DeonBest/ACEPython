@@ -1,0 +1,133 @@
+<script type="text/javascript">
+  var data = [];
+  var labels = [];
+  var featuredata = [];
+  var FRAME_SIZE = 100;
+  ctx = document.getElementById("liveChart");
+  var myLineChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: new Array(500).fill(0),
+      datasets: [
+        {
+          data: data,
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "black",
+          fill: false,
+        },
+      ],
+    },
+    options: {
+      animation: {
+        duration: 0, // general animation time
+      },
+      elements: {
+        line: {
+          tension: 0, // disables bezier curves
+        },
+      },
+      hover: {
+        animationDuration: 0, // duration of animations when hovering an item
+      },
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+      layout: {
+        padding: {
+          left: 0,
+          right: 10,
+          top: 50,
+          bottom: 0,
+        },
+      },
+      responsiveAnimationDuration: 0, // animation duration after a resize
+      scales: {
+        xAxes: [
+          {
+            display: false,
+          },
+        ],
+        yAxes: [
+          {
+            display: true,
+            scaleLabel: {
+              display: true,
+            },
+            ticks: {
+              suggestedMin: -0.08,
+              suggestedMax: 0.08,
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  function onStart() {
+    // This function is an accurate interval function
+    function AdjustingInterval(workFunc, interval, errorFunc) {
+      var that = this;
+      var expected, timeout;
+      this.interval = interval;
+
+      this.start = function () {
+        expected = Date.now() + this.interval;
+        timeout = setTimeout(step, this.interval);
+      };
+
+      this.stop = function () {
+        clearTimeout(timeout);
+      };
+
+      function step() {
+        var drift = Date.now() - expected;
+        if (drift > that.interval) {
+          // You could have some default stuff here too...
+          if (errorFunc) errorFunc();
+        }
+        workFunc();
+        expected += that.interval;
+        timeout = setTimeout(step, Math.max(0, that.interval - drift));
+      }
+    }
+
+    var ticker = null;
+    $("#stopBtn").click(function () {
+      if (ticker != null) {
+        ticker.stop();
+      }
+    });
+    var i = 0;
+    var frame = 0;
+    const featureFrame = ($("#time-step").val() * 1000) / FRAME_SIZE;
+    function doWork() {
+      fetch("http://127.0.0.1:5000/readarr")
+        .then((response) => response.json())
+        .then((result) => {
+          console.log("R", result);
+          if (data.length > 400) {
+            data.splice(0, FRAME_SIZE);
+            labels.splice(0, FRAME_SIZE);
+          }
+
+          data.push({ x: i, y: result });
+          labels.push(i * FRAME_SIZE);
+
+          myLineChart.data.datasets[0].data = data;
+          myLineChart.data.labels = labels;
+          myLineChart.update();
+          i++;
+          frame++;
+        });
+    }
+    ticker = new AdjustingInterval(doWork, FRAME_SIZE);
+    ticker.start();
+  }
+</script>
+<!--end polot-->
+
+<canvas id="liveChart"></canvas>

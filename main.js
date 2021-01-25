@@ -34,7 +34,7 @@ function createWindow() {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile("frontend/pages/quickcollect.html");
+  mainWindow.loadFile("frontend/pages/quickCollect.html");
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
