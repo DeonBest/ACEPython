@@ -1,27 +1,14 @@
 <script type="text/javascript">
   $(function () {
-    /*
-          Populate Dropdowns/Fetch Data
-        */
-    $("#chart2").load("../featurePlot.html");
-
     setTimeout(() => {
-      //CSV Files
-      fetch("http://127.0.0.1:5000/datafiles")
-        .then((response) => response.json())
-        .then((data_files) => {
-          console.log(data_files);
-          for (i = 0; i < data_files.length; i++) {
-            const split = data_files[i].split("/");
-            file_name = split[split.length - 1];
-            $("#file-select").append(
-              $("<option>", {
-                value: data_files[i],
-                text: file_name,
-              })
-            );
-          }
-        });
+      features.forEach((feature, index) => {
+        $("#feature-select").append(
+          $("<option>", {
+            value: feature.function,
+            text: feature.name,
+          })
+        );
+      });
     }, 1000);
   });
 </script>
