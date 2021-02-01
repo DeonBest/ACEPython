@@ -18,9 +18,24 @@ def datafiles():
         for file in glob.glob(os.path.dirname(os.path.realpath(__file__))+'/data/*.csv'):
             my_list.append(file)
         return json.dumps(my_list)
-    except:
-        e = sys.exc_info()[0]
+    except Exception as e:
         return json.dumps(str(e))
+
+@app.route("/actions")
+def actions():
+    
+        my_list=[]
+        for file in glob.glob(os.path.dirname(os.path.realpath(__file__))+'/../frontend/images/actions/*.jpg'):
+            actionname = os.path.basename(file).replace("_", " ").replace(".jpg","").capitalize()
+            actionkey=os.path.basename(file)
+            action = {
+                'file_location': file,
+                'action_name': actionname,
+                'action_key': actionkey
+            }
+            my_list.append(action)
+        return json.dumps(my_list)
+
 
 @app.route("/readarr")
 def readarr():
@@ -45,6 +60,7 @@ def readcsv(filename, frame=0):
 
 
 if __name__ == "__main__":
+    print(actions())
     app.run(host='127.0.0.1', port=5000)
     
 

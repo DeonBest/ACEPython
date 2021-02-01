@@ -1,4 +1,18 @@
+<script type="text/javascript">
+  const onOpenPrompt = () => {
+    const remote = require("electron").remote;
+    const BrowserWindow = remote.BrowserWindow;
+    const win = new BrowserWindow({
+      height: 600,
+      width: 800,
+    });
+
+    win.loadFile(__dirname + "/actionPrompt.html");
+    win.webContents.openDevTools();
+  };
+</script>
 <div class="promptViewContainer">
-  <button style="width: 50%; margin-bottom: 5px">Open</button
+  <button style="width: 50%; margin-bottom: 5px" onclick="onOpenPrompt()">
+    Open</button
   ><button style="width: 50%">Preview</button>
 </div>

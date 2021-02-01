@@ -4,6 +4,8 @@
   var labels = [];
   var featuredata = [];
   var FRAME_SIZE = 100;
+  var FRAME_SIZE_LIVE = 1;
+  var INTERVAL_TIME = 100;
   ctx = document.getElementById("liveChart");
   var myLineChart = new Chart(ctx, {
     type: "line",
@@ -106,25 +108,23 @@
     if ($("#input-type-live").is(":checked")) {
       var i = 0;
       var frame = 0;
-      const featureFrame = ($("#time-step").val() * 1000) / FRAME_SIZE;
+      const featureFrame = ($("#time-step").val() * 1000) / INTERVAL_TIME;
       function doWork() {
         fetch("http://127.0.0.1:5000/readarr")
           .then((response) => response.json())
           .then((result) => {
-            console.log("R", result);
-            if (data.length > 400) {
-              data.splice(0, FRAME_SIZE);
-              labels.splice(0, FRAME_SIZE);
+            if (data.length > 100) {
+              data.splice(0, FRAME_SIZE_LIVE);
+              labels.splice(0, FRAME_SIZE_LIVE);
             }
             //Feature
             console.log(frame, featureFrame);
             if (frame % featureFrame == 0) {
-              console.log("feature", featuredata);
               onNewFeatureData(featuredata);
               featuredata = [];
             }
             data.push({ x: i, y: result });
-            labels.push(i * FRAME_SIZE);
+            labels.push(i);
 
             //csvdata = csvdata.concat(newData);
             featuredata.push(result);
@@ -135,14 +135,14 @@
             frame++;
           });
       }
-      ticker = new AdjustingInterval(doWork, FRAME_SIZE);
+      ticker = new AdjustingInterval(doWork, INTERVAL_TIME);
       ticker.start();
     } else if ($("#input-type-file").is(":checked")) {
       var frame = 0;
 
       var ms = 0;
       const file = $("#file-select option:selected").text();
-      const featureFrame = ($("#time-step").val() * 1000) / FRAME_SIZE;
+      const featureFrame = ($("#time-step").val() * 1000) / INTERVAL_TIME;
       fetch("http://127.0.0.1:5000/readcsv/" + file)
         .then((response) => response.json())
         .then((result) => {
@@ -172,7 +172,7 @@
 
             frame++;
           }
-          ticker = new AdjustingInterval(doWork, FRAME_SIZE);
+          ticker = new AdjustingInterval(doWork, INTERVAL_TIME);
           ticker.start();
         });
     }

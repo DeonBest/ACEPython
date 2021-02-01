@@ -17,8 +17,50 @@
     width: 80px;
   }
 </style>
-
-<ul class="list-group" style="max-height: 40vh; overflow-y: scroll">
+<script>
+  $(function () {
+    fetch("http://127.0.0.1:5000/actions")
+      .then((response) => response.json())
+      .then((result) => {
+        console.log("R", result);
+        result.map((action) => {
+          $("#list").append(`
+              <li class="list-group-item">
+                <div class="action-list-item">
+                  <div class="action-list-field-sm">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      value=""
+                      id="${action.action_key}-disabled"
+                    />
+                  </div>
+                  <div class="action-list-field-lg">${action.action_name}</div>
+                  <div class="action-list-field-md">
+                    <input
+                      type="number"
+                      class="form-control form-control-sm"
+                      id="action-reps-${action.action_key}"
+                      aria-describedby="repsIn"
+                    />
+                  </div>
+                  <div class="action-list-field-md" style="float: right">
+                    <input
+                      style="float: right"
+                      type="number"
+                      class="form-control form-control-sm"
+                      id="action-status-${action.action_key}"
+                      aria-describedby="actionStatus"
+                    />
+                  </div>
+                </div>
+              </li>
+        `);
+        });
+      });
+  });
+</script>
+<ul class="list-group" id="list" style="max-height: 40vh; overflow-y: scroll">
   <li class="list-group-item">
     <div class="action-list-item">
       <div class="action-list-field-sm"></div>
@@ -31,36 +73,4 @@
       </div>
     </div>
   </li>
-  <li class="list-group-item">
-    <div class="action-list-item">
-      <div class="action-list-field-sm">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          value=""
-          id="flexCheckDisabled"
-        />
-      </div>
-      <div class="action-list-field-lg">Open Hand</div>
-      <div class="action-list-field-md">
-        <input
-          type="number"
-          class="form-control form-control-sm"
-          id="action-reps"
-          aria-describedby="repsIn"
-        />
-      </div>
-      <div class="action-list-field-md" style="float: right">
-        <input
-          style="float: right"
-          type="number"
-          class="form-control form-control-sm"
-          id="action-status"
-          aria-describedby="actionStatus"
-        />
-      </div>
-    </div>
-  </li>
-  <li class="list-group-item">Dapibus ac facilisis in</li>
-  <li class="list-group-item">Morbi leo risus</li>
 </ul>
