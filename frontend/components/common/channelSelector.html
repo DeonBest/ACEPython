@@ -6,12 +6,10 @@
     switch (channel) {
       case "all":
         if ($(`#qc-channel-all`).attr("active") === "true") {
-          console.log("all true");
           $("button[id^='qc-channel-']").removeClass("btn btn-primary");
           $("button[id^='qc-channel-']").addClass("btn btn-secondary");
           $("button[id^='qc-channel-']").attr("active", "false");
         } else {
-          console.log("all false");
           $("button[id^='qc-channel-']").removeClass("btn btn-secondary");
           $("button[id^='qc-channel-']").addClass("btn btn-primary");
           $("button[id^='qc-channel-']").attr("active", "true");

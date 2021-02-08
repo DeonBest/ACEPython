@@ -8,6 +8,22 @@
     padding: 5px;
   }
 </style>
+<script type="text/javascript">
+  $("#action-duration").val(collectionConfig.duration);
+  $("#action-duration").change((e) => {
+    collectionConfig.duration = e.target.value;
+  });
+
+  $("#action-delay").val(collectionConfig.delay);
+  $("#action-delay").change((e) => {
+    collectionConfig.delay = e.target.value;
+  });
+
+  $("#action-trials").val(collectionConfig.trials);
+  $("#action-trials").change((e) => {
+    collectionConfig.trials = e.target.value;
+  });
+</script>
 
 <div class="collectionSettingsContainer">
   <div class="settingsContainer">
@@ -16,7 +32,7 @@
       <input
         type="number"
         class="form-control form-control-sm"
-        id="action-status"
+        id="action-duration"
         aria-describedby="actionStatus"
       />
     </div>
@@ -27,7 +43,8 @@
       <input
         type="number"
         class="form-control form-control-sm"
-        id="action-status"
+        id="action-delay"
+        value="collectionConfig.delay"
         aria-describedby="actionStatus"
       />
     </div>
@@ -38,8 +55,9 @@
       <input
         type="number"
         class="form-control form-control-sm"
-        id="action-status"
+        id="action-trials"
         aria-describedby="actionStatus"
+        onchange="onTrialChange()"
       />
     </div>
   </div>

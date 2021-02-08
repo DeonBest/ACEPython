@@ -14,7 +14,7 @@ import serial
 for com in list_ports.comports():
     print(com)
 #Serial(port=None, baudrate=9600, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=None, xonxoff=False, rtscts=False, write_timeout=None, dsrdtr=False, inter_byte_timeout=None)
-ser = serial.Serial('/dev/tty.usbserial-14200')#, 9800, 8, serial.PARITY_NONE, serial.STOPBITS_ONE,1)
+ser = serial.Serial('/dev/tty.usbserial-14100', 500000, 8, serial.PARITY_NONE, serial.STOPBITS_ONE,1)
 
 
 try:

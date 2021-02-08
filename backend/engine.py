@@ -39,7 +39,7 @@ def actions():
 
 @app.route("/readarr")
 def readarr():
-    return jsonify(random.randint(0,100))
+    return jsonify(random.uniform(-0.5, 0.5))
 
 @app.route("/readarr2")
 def readarr2():
