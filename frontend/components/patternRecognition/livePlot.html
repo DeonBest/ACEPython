@@ -1,24 +1,27 @@
 <script type="text/javascript">
   /* appdata={
-  trials:[
-    [{
-      action: 'Hand Open',
-      reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
-    },
-    {
-      action: 'Wrist Adduction',
-      reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
-    }],
-    [{
-      action: 'Hand Open',
-      reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
-    },
-    {
-      action: 'Wrist Adduction',
-      reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
-    }]
-  ]
-} */
+    trials:[
+      {
+        action: 'Hand Open',
+        reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
+      },
+      {
+        action: 'Wrist Adduction',
+        reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
+      },
+      {
+        action: 'Hand Open',
+        reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
+      },
+      {
+        action: 'Wrist Adduction',
+        reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
+      }
+    ]
+  } */
+  var currentTrial = 0,
+    currentAction = 0,
+    currentRep = 0;
   var chartdata = [];
   var actiondata = [];
   var labels = [];
@@ -126,16 +129,17 @@
     var i = 0,
       currentIteration = 0,
       frame = 0;
-    actionsCount = 0;
     const featureFrame = ($("#time-step").val() * 1000) / FRAME_SIZE;
-    var start = Date.now();
+
     const ipcRenderer = require("electron").ipcRenderer;
-    const countdownTimerms = 5000;
+    const countdownTimerms = 3000;
     const delayms = collectionConfig.delay * 1000;
     const durationms = collectionConfig.duration * 1000;
     const iterationLength = durationms / FRAME_SIZE; //How many iterations do we collect each action
-    var done = false;
-    function doWork() {
+    var done = false,
+      collectionComplete = false;
+    let start = Date.now();
+    function doWork(trial, action, rep) {
       if (!done) {
         // Is In delay
         if (Date.now() - start < countdownTimerms) {
@@ -148,36 +152,16 @@
               progress: parseInt(progressToStart),
               text: `Starting in ${parseInt(untilStart) + 1}`,
             },
-            image: collectionConfig.actions[actionsCount].key,
+            image: collectionConfig.actions[action].key,
           });
         } else {
           if (currentIteration == iterationLength) {
-            //Collection for this action is completed, wait delay and collect for another action
-            console.log("Action data", actiondata, collectionConfig.actions);
-            collectionConfig.actions[actionsCount].data = actiondata;
-            const reps = [actiondata];
-            appdata[0].push({
-              action: collectionConfig.actions[actionsCount].name,
-              reps,
-            });
-
+            done = true;
+            console.log("T", trial, "A", action, appdata);
+            appdata.trials[trial][action].reps.push(actiondata);
+            currentIteration = 0;
             actiondata = [];
-            start = Date.now(); //Reset time so Is In Delay is triggered
-            actionsCount++;
-            if (collectionConfig.actions.length == actionsCount) {
-              ticker.stop();
-              done = true;
-              promptWindow.webContents.send("message", {
-                text: "Done",
-                progress: {
-                  progress: parseInt(100),
-                  text: `Done`,
-                },
-              });
-            } else {
-              // Onto to the next action / rep
-              currentIteration = 0;
-            }
+            ticker.stop();
           }
           const untilEnd =
             ((Date.now() - (start + countdownTimerms)) / durationms) * 100;
@@ -217,9 +201,81 @@
         }
       }
     }
-    ticker = new AdjustingInterval(doWork, FRAME_SIZE);
+
+    // START COLLECTION
+
+    var repCount = collectionConfig.actions[currentAction].reps - 1;
+    var trialCount = collectionConfig.trials;
+
     if (collectionConfig.actions.length > 0) {
+      //Init
+      appdata.trials.push([]);
+      appdata.trials[currentTrial].push({
+        name: collectionConfig.actions[0].name,
+        reps: [],
+      });
+
+      ticker = new AdjustingInterval(
+        () => doWork(currentTrial, currentAction, currentRep),
+        FRAME_SIZE
+      );
       ticker.start();
+      function checkFlag() {
+        if (done == false) {
+          setTimeout(checkFlag, FRAME_SIZE);
+        } else {
+          if (currentRep % repCount == 0 && currentRep != 0) {
+            currentRep = 0;
+            currentAction++;
+            if (
+              currentAction % collectionConfig.actions.length == 0 &&
+              currentAction != 0
+            ) {
+              currentAction = 0;
+              currentTrial++;
+              if (currentTrial % trialCount == 0 && currentTrial != 0) {
+                collectionComplete = true;
+                ticker.stop();
+              } else {
+                appdata.trials.push([]);
+                appdata.trials[currentTrial].push({
+                  name: collectionConfig.actions[0].name,
+                  reps: [],
+                });
+              }
+            } else {
+              appdata.trials[currentTrial].push({
+                name: collectionConfig.actions[currentAction].name,
+                reps: [],
+              });
+            }
+          } else {
+            currentRep++;
+          }
+
+          if (!collectionComplete) {
+            ticker.stop();
+            start = Date.now();
+            done = false;
+            ticker = new AdjustingInterval(
+              () => doWork(currentTrial, currentAction, currentRep),
+              FRAME_SIZE
+            );
+            ticker.start();
+            setTimeout(checkFlag, FRAME_SIZE);
+          } else {
+            // DONE
+            promptWindow.webContents.send("message", {
+              text: "Done",
+              progress: {
+                progress: parseInt(100),
+                text: `Done`,
+              },
+            });
+          }
+        }
+      }
+      checkFlag();
     } else {
       console.log("error, select an action");
     }
