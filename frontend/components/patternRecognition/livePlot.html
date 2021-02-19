@@ -157,7 +157,6 @@
         } else {
           if (currentIteration == iterationLength) {
             done = true;
-            console.log("T", trial, "A", action, appdata);
             appdata.trials[trial][action].reps.push(actiondata);
             currentIteration = 0;
             actiondata = [];
@@ -203,12 +202,10 @@
     }
 
     // START COLLECTION
-
-    var repCount = collectionConfig.actions[currentAction].reps - 1;
-    var trialCount = collectionConfig.trials;
-
     if (collectionConfig.actions.length > 0) {
       //Init
+      var repCount = collectionConfig.actions[currentAction].reps;
+      var trialCount = collectionConfig.trials;
       appdata.trials.push([]);
       appdata.trials[currentTrial].push({
         name: collectionConfig.actions[0].name,
@@ -224,6 +221,9 @@
         if (done == false) {
           setTimeout(checkFlag, FRAME_SIZE);
         } else {
+          setStatus(collectionConfig.actions[currentAction].key, true, 0);
+          console.log(currentRep, currentAction, currentTrial);
+          currentRep++;
           if (currentRep % repCount == 0 && currentRep != 0) {
             currentRep = 0;
             currentAction++;
@@ -242,15 +242,17 @@
                   name: collectionConfig.actions[0].name,
                   reps: [],
                 });
+                repCount = collectionConfig.actions[0].reps;
               }
             } else {
               appdata.trials[currentTrial].push({
                 name: collectionConfig.actions[currentAction].name,
                 reps: [],
               });
+              repCount = collectionConfig.actions[currentAction].reps;
             }
           } else {
-            currentRep++;
+            //currentRep++;
           }
 
           if (!collectionComplete) {
@@ -261,10 +263,12 @@
               () => doWork(currentTrial, currentAction, currentRep),
               FRAME_SIZE
             );
+            console.log("Data", appdata);
             ticker.start();
             setTimeout(checkFlag, FRAME_SIZE);
           } else {
             // DONE
+            console.log(appdata);
             promptWindow.webContents.send("message", {
               text: "Done",
               progress: {
@@ -278,6 +282,7 @@
       checkFlag();
     } else {
       console.log("error, select an action");
+      showToast("No actions selected");
     }
   }
 </script>

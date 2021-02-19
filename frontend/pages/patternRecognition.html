@@ -26,18 +26,19 @@
     <link
     rel="stylesheet"
     type="text/css"
-    href="../../styles/common.css"
+    href="../styles/common.css"
   />
   <link
     rel="stylesheet"
     type="text/css"
-    href="../../styles/patternRecognition.css"
+    href="../styles/patternRecognition.css"
   />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
 
   <script type="text/javascript">
     var appdata={trials:[]};
+    let promptWindow;
     var collectionConfig={
       duration:5,
       delay:5,
@@ -60,18 +61,33 @@
     const onOpenPrompt = () => {
     const remote = require("electron").remote;
     const BrowserWindow = remote.BrowserWindow;
-    promptWindow = new BrowserWindow({
-      height: 600,
-      width: 800,
+    // Create new window if first time opening prompt
+    if(promptWindow==undefined){
+      promptWindow = new BrowserWindow({
+        height: 600,
+        width: 800,
+      });
+      console.log(__dirname)
+      promptWindow.loadFile(__dirname + "/actionPrompt.html");
+      promptWindow.webContents.openDevTools();
+    }
+    else{ 
+      promptWindow.loadFile(__dirname + "/actionPrompt.html");
+      promptWindow.webContents.openDevTools();
+    }
+    promptWindow.on('close', function() { //   <---- Catch close event
+      console.log("promptWindow Close");
+      promptWindow=undefined;
     });
-console.log(__dirname)
-promptWindow.loadFile(__dirname + "/../actionPrompt.html");
-promptWindow.webContents.openDevTools();
+
+    
+    
+
+
     
   };
   </script>
 </head>
-
 
 <body>
   <div id="navigation"></div>

@@ -1,0 +1,23 @@
+<script type="text/javascript">
+  function showToast(text) {
+    console.log(text);
+    $("#toast-text").html(text);
+    $(".toast").toast("show");
+  }
+</script>
+
+<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <div style="display: flex; justify-content: space-between; width: 100%">
+      <strong class="mr-auto">Error</strong>
+      <small class="text-muted"></small>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="toast"
+        aria-label="Close"
+      ></button>
+    </div>
+  </div>
+  <div class="toast-body" id="toast-text"></div>
+</div>

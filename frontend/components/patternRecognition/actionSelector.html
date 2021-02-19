@@ -18,6 +18,26 @@
   }
 </style>
 <script>
+  function handleSetAllReps() {
+    console.log("Test reps");
+  }
+
+  function handleSelectAll() {
+    console.log("Test select all");
+  }
+
+  function setStatus(key, increment, value) {
+    if (increment) {
+      let val = parseInt(
+        document.getElementById(`action-status-${key}`).innerHTML
+      );
+      val++;
+      document.getElementById(`action-status-${key}`).innerHTML = val;
+      console.log(val);
+    } else {
+      document.getElementById(`action-status-${key}`).innerHTML = value;
+    }
+  }
   function handleRepsChange(actionKey, actionName) {
     const reps = parseInt(
       document.getElementById(`action-reps-${actionKey}`).value
@@ -119,3 +139,26 @@
     </div>
   </li>
 </ul>
+<div class="action-list-item">
+  <div class="action-list-field-sm"></div>
+  <div class="action-list-field-lg">
+    <div style="align-items: center; display: flex; margin: 5px">
+      <button onclick="handleSelectAll()">Select All</button>
+    </div>
+  </div>
+  <div class="action-list-field-md">
+    <div style="display: flex; align-items: center">
+      Set All
+      <input
+        type="number"
+        class="form-control form-control-sm"
+        value="0"
+        id="action-reps-${action.action_key}"
+        aria-describedby="repsIn"
+        onchange="handleSetAllReps()"
+        style="margin: 5px"
+      />
+    </div>
+  </div>
+  <div class="action-list-field-md"></div>
+</div>

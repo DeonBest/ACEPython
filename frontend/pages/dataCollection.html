@@ -3,13 +3,14 @@
        /*
             Add in components
           */
-      $("#navigation").load("../../components/common/navbar.html");
-      $("#chart").load("../../components/patternRecognition/livePlot.html");
-      $("#channels").load("../../components/common/channelSelector.html");
-      $('#inputTypeContainer').load("../../components/common/inputTypeSelector.html")
-      $('#actionContainer').load("../../components/patternRecognition/actionSelector.html")
-      $('#collectionSettings').load("../../components/patternRecognition/collectionSettings.html")
-      $('#promptView').load("../../components/patternRecognition/promptView.html")
+      $("#navigation").load("../components/common/navbar.html");
+      $("#chart").load("../components/patternRecognition/livePlot.html");
+      $("#channels").load("../components/common/channelSelector.html");
+      $('#inputTypeContainer').load("../components/common/inputTypeSelector.html")
+      $('#actionContainer').load("../components/patternRecognition/actionSelector.html")
+      $('#collectionSettings').load("../components/patternRecognition/collectionSettings.html")
+      $('#promptView').load("../components/patternRecognition/promptView.html")
+      $("#toast").load("../components/common/toast.html");
     });
     function collect(){
 
@@ -17,7 +18,8 @@
         onStart();
     }
   </script>
-
+  
+<div>
 <div class="row">
     <div class="col" id="chart">
       <div id="chart"></div>
@@ -81,3 +83,5 @@
         </div>
     </div>
     </div>
+    <div id='toast'></div>
+  </div>
