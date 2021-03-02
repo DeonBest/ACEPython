@@ -18,12 +18,26 @@
   }
 </style>
 <script>
+  let actions = [];
   function handleSetAllReps() {
-    console.log("Test reps");
+    const reps = parseInt(document.getElementById(`action-reps-all`).value);
+    actions.forEach((action) =>
+      handleRepsChange(action.action_key, action.action_name, reps)
+    );
+    var inputs = $('[id^="action-reps-"]');
+    for (var i = 0; i < inputs.length; i++) {
+      console.log(inputs[i]);
+      inputs[i].value = reps;
+      reps;
+    }
   }
 
   function handleSelectAll() {
-    console.log("Test select all");
+    actions.forEach((action) => {
+      handleActionSelection(action.action_key, action.action_name);
+      //$(`${action.action_key}`).prop("checked", true);
+    });
+    $(`.action_checkbox`).prop("checked", true);
   }
 
   function setStatus(key, increment, value) {
@@ -33,16 +47,19 @@
       );
       val++;
       document.getElementById(`action-status-${key}`).innerHTML = val;
-      console.log(val);
     } else {
       document.getElementById(`action-status-${key}`).innerHTML = value;
     }
   }
-  function handleRepsChange(actionKey, actionName) {
-    const reps = parseInt(
+  function handleRepsChange(actionKey, actionName, repsIn) {
+    var reps = parseInt(
       document.getElementById(`action-reps-${actionKey}`).value
     );
-    // If already added, update its reps, otherwise ignore
+    // Optional param receives valuem used with set all option
+    if (repsIn != null) {
+      reps = repsIn;
+    }
+    // If already added to list of actions, update its reps, otherwise ignore
     var actions = collectionConfig.actions;
     if (actions.some((action) => action.name === actionName)) {
       var actions = collectionConfig.actions;
@@ -57,8 +74,7 @@
   }
   function handleActionSelection(actionKey, actionName) {
     const checked = document.getElementById(actionKey).checked;
-    console.log(checked);
-
+    console.log(collectionConfig);
     const reps = parseInt(
       document.getElementById(`action-reps-${actionKey}`).value
     );
@@ -78,13 +94,13 @@
       });
     }
     collectionConfig.actions = actions;
-    console.log(actions);
   }
   $(function () {
     fetch("http://127.0.0.1:5000/actions")
       .then((response) => response.json())
       .then((result) => {
         console.log("R", result);
+        actions = result;
         result.map((action) => {
           $("#list").append(`
               <li class="list-group-item">
@@ -94,6 +110,7 @@
                       type="checkbox"
                       onclick="handleActionSelection('${action.action_key}','${action.action_name}')"
                       id="${action.action_key}"
+                      class="action_checkbox"
                     />
                   </div>
                   <div class="action-list-field-lg">${action.action_name}</div>
@@ -153,7 +170,7 @@
         type="number"
         class="form-control form-control-sm"
         value="0"
-        id="action-reps-${action.action_key}"
+        id="action-reps-all"
         aria-describedby="repsIn"
         onchange="handleSetAllReps()"
         style="margin: 5px"

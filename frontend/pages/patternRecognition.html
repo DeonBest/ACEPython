@@ -47,7 +47,9 @@
     }
 
     $(function () {
-      $('#patternRecContainer').load("./dataCollection.html")
+      $('#dataCollectionTabContainer').load("./dataCollection.html")
+      $('#dataReviewTabContainer').load("./dataReview.html")
+      $('#dataClassificationTabContainer').load("./dataClassification.html")
     });
 
     function onTabChange(tab){
@@ -55,8 +57,14 @@
       $(`#${tab}Tab`)
             .toggleClass("active")
     
-      $('#patternRecContainer').load(`./${tab}.html`);
-    }  
+
+      var ele = document.getElementsByClassName('tabContainer');
+      for (var i = 0; i < ele.length; i++ ) {
+          ele[i].style.display = "none";
+      }
+      var container = document.getElementById(`${tab}TabContainer`);
+      container.style.display = "block";
+    }
 
     const onOpenPrompt = () => {
     const remote = require("electron").remote;
@@ -102,8 +110,14 @@
       <a class="nav-link"  id="dataClassificationTab"onclick="onTabChange('dataClassification')">Data Classification</a>
     </li>
   </ul>
-  <div class="container" id='patternRecContainer'>
+  <div class="tabContainer" id='dataCollectionTabContainer'>
    
+  </div>
+  <div class="tabContainer" id='dataReviewTabContainer' style='display:none;'>
+
+  </div>
+  <div class="tabContainer" id='dataClassificationTabContainer' style='display:none;'>
+
   </div>
 
 
