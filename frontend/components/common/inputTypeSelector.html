@@ -23,10 +23,32 @@ $(function () {
             }
           });
 
+          //input types
+          fetch("http://127.0.0.1:5000/getreaders")
+          .then((response) => response.json())
+          .then((readers) => {
+            console.log(readers);
+            for (i = 0; i < readers.length; i++) {
+              $("#input-select").append(
+                $("<option>", {
+                  value: readers[i].key,
+                  text: readers[i].name,
+                })
+              );
+            }
+          });
+
       }, 1000);
     });
 
-  
+    $('#input-select').on('change', function() {
+      console.log(this.value)
+      if(this.value=='filereader'){ 
+        $("#file-select").attr("disabled", false);
+        $("#file-select").attr('style', 'display:inline')
+      }
+      else{ $("#file-select").attr('style', 'display:none')}
+    });
 function onFileSelect() {
     //set radio to file and enable the file selector
     $("#file-select").attr("disabled", false);
@@ -38,39 +60,27 @@ function onFileSelect() {
     $("#file-select").attr("disabled", true);
     $("#input-type-file").attr("checked", false);
   }
+  function onRandomSelect() {
+    //set radio to live and disable the file selector
+    $("#file-select").attr("disabled", true);
+    $("#input-type-file").attr("checked", false);
+    $("#input-type-random").attr("checked", true);
+  }
 </script>
-<div class="form-check">
-    <input
-      class="form-check-input"
-      type="radio"
-      name="flexRadioDefault"
-      id="input-type-live"
-      checked
-      onclick="onLiveSelect()"
-    />
-    <label class="form-check-label" for="flexRadioDefault2">
-      Live
-    </label>
-  </div>
-  <div class="form-check">
-    <input
-      class="form-check-input"
-      type="radio"
-      name="flexRadioDefault"
-      id="input-type-file"
-      onclick="onFileSelect()"
-    />
-    <label class="form-check-label" for="flexRadioDefault1">
-      File
-    </label>
-  </div>
 
+  <select
+    id="input-select"
+    class="form-select"
+    aria-label="Default select example"
+  >
+    <option selected>Input</option>
+  </select>
   <select
     id="file-select"
     class="form-select"
     aria-label="Default select example"
+    style='display:none'
     disabled
   >
-    <option selected>File</option>
   </select>
 </div>

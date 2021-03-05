@@ -1,27 +1,8 @@
 <script type="text/javascript">
-  /* appdata={
-    trials:[
-      {
-        action: 'Hand Open',
-        reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
-      },
-      {
-        action: 'Wrist Adduction',
-        reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
-      },
-      {
-        action: 'Hand Open',
-        reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
-      },
-      {
-        action: 'Wrist Adduction',
-        reps: [[ch1], [ch2], [ch3], [ch4], [ch5], [ch6], [ch7], [ch8]]
-      }
-    ]
-  } */
   var currentTrial = 0,
     currentAction = 0,
-    currentRep = 0;
+    currentRep = 0,
+    i = 0;
   var chartdata = [];
   var actiondata = [];
   var labels = [];
@@ -92,7 +73,8 @@
     },
   });
 
-  function onStart() {
+  function onStart(collect) {
+    console.log("COLLECT", collect, currentTrial);
     // This function is an accurate interval function
     function AdjustingInterval(workFunc, interval, errorFunc) {
       var that = this;
@@ -126,8 +108,7 @@
         ticker.stop();
       }
     });
-    var i = 0,
-      currentIteration = 0,
+    var currentIteration = 0,
       frame = 0;
     const featureFrame = ($("#time-step").val() * 1000) / FRAME_SIZE;
 
@@ -157,7 +138,7 @@
         } else {
           if (currentIteration == iterationLength) {
             done = true;
-            appdata.trials[trial][action].reps.push(actiondata);
+            if (collect) appdata.trials[trial][action].reps.push(actiondata);
             currentIteration = 0;
             actiondata = [];
             ticker.stop();
@@ -172,24 +153,31 @@
               text: `Recording`,
             },
           });
-          fetch("http://127.0.0.1:5000/readarr")
+          const reader = $("#input-select").val();
+          fetch(`http://127.0.0.1:5000/read/${reader}`)
             .then((response) => response.json())
             .then((result) => {
-              if (chartdata.length > 100) {
-                chartdata.splice(0, FRAME_SIZE_LIVE);
-                labels.splice(0, FRAME_SIZE_LIVE);
+              console.log("I", i);
+              console.log("Chart Data", chartdata);
+              if (chartdata.length > 1000) {
+                chartdata.splice(0, FRAME_SIZE);
+                labels.splice(0, FRAME_SIZE);
               }
               //Feature
               if (frame % featureFrame == 0) {
                 onNewFeatureData(featuredata);
                 featuredata = [];
               }
-              chartdata.push({ x: i, y: result });
-              actiondata.push({ x: i, y: result });
-              labels.push(i);
+
+              result.map((dataPoint) => {
+                labels.push(i);
+                chartdata.push({ x: i, y: dataPoint });
+                actiondata.push({ x: i, y: dataPoint });
+                featuredata.push(dataPoint);
+                i++;
+              });
 
               //csvdata = csvdata.concat(newData);
-              featuredata.push(result);
               myLineChart.data.datasets[0].data = chartdata;
               myLineChart.data.labels = labels;
               myLineChart.update();
@@ -206,11 +194,13 @@
       //Init
       var repCount = collectionConfig.actions[currentAction].reps;
       var trialCount = collectionConfig.trials;
-      appdata.trials.push([]);
-      appdata.trials[currentTrial].push({
-        name: collectionConfig.actions[0].name,
-        reps: [],
-      });
+      if (collect) {
+        appdata.trials.push([]);
+        appdata.trials[currentTrial].push({
+          name: collectionConfig.actions[0].name,
+          reps: [],
+        });
+      }
 
       ticker = new AdjustingInterval(
         () => doWork(currentTrial, currentAction, currentRep),
@@ -237,18 +227,21 @@
                 collectionComplete = true;
                 ticker.stop();
               } else {
-                appdata.trials.push([]);
-                appdata.trials[currentTrial].push({
-                  name: collectionConfig.actions[0].name,
-                  reps: [],
-                });
+                if (collect) {
+                  appdata.trials.push([]);
+                  appdata.trials[currentTrial].push({
+                    name: collectionConfig.actions[0].name,
+                    reps: [],
+                  });
+                }
                 repCount = collectionConfig.actions[0].reps;
               }
             } else {
-              appdata.trials[currentTrial].push({
-                name: collectionConfig.actions[currentAction].name,
-                reps: [],
-              });
+              if (collect)
+                appdata.trials[currentTrial].push({
+                  name: collectionConfig.actions[currentAction].name,
+                  reps: [],
+                });
               repCount = collectionConfig.actions[currentAction].reps;
             }
           } else {
@@ -269,6 +262,14 @@
           } else {
             // DONE
             console.log(appdata);
+            // Reset indexes if data not recorded
+            if (!collect) {
+              (currentTrial = 0),
+                (currentAction = 0),
+                (currentRep = 0),
+                (currentIteration = 0),
+                (frame = 0);
+            }
             promptWindow.webContents.send("message", {
               text: "Done",
               progress: {

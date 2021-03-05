@@ -13,9 +13,12 @@
       $("#toast").load("../components/common/toast.html");
     });
     function collect(){
-
         onOpenPrompt();
-        onStart();
+        onStart(true);
+    }
+    function preview(){
+      onOpenPrompt();
+      onStart(false);
     }
   </script>
   

@@ -4,7 +4,6 @@
   var labels = [];
   var featuredata = [];
   var FRAME_SIZE = 100;
-  var FRAME_SIZE_LIVE = 1;
   var INTERVAL_TIME = 100;
   ctx = document.getElementById("liveChart");
   var myLineChart = new Chart(ctx, {
@@ -71,6 +70,7 @@
   });
 
   function onStart() {
+    console.log("START");
     // This function is an accurate interval function
     function AdjustingInterval(workFunc, interval, errorFunc) {
       var that = this;
@@ -105,77 +105,44 @@
       }
     });
 
-    if ($("#input-type-live").is(":checked")) {
-      var i = 0;
-      var frame = 0;
-      const featureFrame = ($("#time-step").val() * 1000) / INTERVAL_TIME;
-      function doWork() {
-        fetch("http://127.0.0.1:5000/readarr")
-          .then((response) => response.json())
-          .then((result) => {
-            if (data.length > 100) {
-              data.splice(0, FRAME_SIZE_LIVE);
-              labels.splice(0, FRAME_SIZE_LIVE);
-            }
-            //Feature
-            console.log(frame, featureFrame);
-            if (frame % featureFrame == 0) {
-              onNewFeatureData(featuredata);
-              featuredata = [];
-            }
-            data.push({ x: i, y: result });
-            labels.push(i);
+    var i = 0;
+    var frame = 0;
+    const featureFrame = ($("#time-step").val() * 1000) / INTERVAL_TIME;
 
-            //csvdata = csvdata.concat(newData);
-            featuredata.push(result);
-            myLineChart.data.datasets[0].data = data;
-            myLineChart.data.labels = labels;
-            myLineChart.update();
-            i++;
-            frame++;
-          });
-      }
-      ticker = new AdjustingInterval(doWork, INTERVAL_TIME);
-      ticker.start();
-    } else if ($("#input-type-file").is(":checked")) {
-      var frame = 0;
-
-      var ms = 0;
-      const file = $("#file-select option:selected").text();
-      const featureFrame = ($("#time-step").val() * 1000) / INTERVAL_TIME;
-      fetch("http://127.0.0.1:5000/readcsv/" + file)
+    function doWork() {
+      console.log(Date.now());
+      const reader = $("#input-select").val();
+      fetch(`http://127.0.0.1:5000/read/${reader}`)
         .then((response) => response.json())
         .then((result) => {
-          var startTime = performance.now();
-          function doWork() {
-            if (csvdata.length > 400) {
-              csvdata.splice(0, FRAME_SIZE);
-              labels.splice(0, FRAME_SIZE);
-            }
-            //Feature
-
-            if (frame % featureFrame == 0) {
-              onNewFeatureData(featuredata);
-              featuredata = [];
-            }
-            const newData = result.splice(0, FRAME_SIZE);
-            const newDataFormatted = newData.map((d, i) => {
-              //if (frame * FRAME_SIZE > 1000) csvdata.shift();
-              csvdata.push({ x: i + frame * FRAME_SIZE, y: d });
-              labels.push(i + frame * FRAME_SIZE);
-            });
-            //csvdata = csvdata.concat(newData);
-            myLineChart.data.datasets[0].data = csvdata;
-            myLineChart.data.labels = labels;
-            myLineChart.update();
-            featuredata = featuredata.concat(newData);
-
-            frame++;
+          if (data.length > 1000) {
+            data.splice(0, FRAME_SIZE);
+            labels.splice(0, FRAME_SIZE);
           }
-          ticker = new AdjustingInterval(doWork, INTERVAL_TIME);
-          ticker.start();
+          //Feature
+          console.log(data.length);
+          if (frame % featureFrame == 0) {
+            onNewFeatureData(featuredata);
+            featuredata = [];
+          }
+
+          result.map((dataPoint) => {
+            labels.push(i);
+            data.push({ x: i, y: dataPoint });
+            featuredata.push(dataPoint);
+            i++;
+          });
+          console.log(labels, data);
+          //data.push({ x: i, y: result });
+          //labels.push(i);
+          myLineChart.data.datasets[0].data = data;
+          myLineChart.data.labels = labels;
+          myLineChart.update();
+          frame++;
         });
     }
+    ticker = new AdjustingInterval(doWork, INTERVAL_TIME);
+    ticker.start();
   }
 </script>
 <!--end polot-->

@@ -30,7 +30,6 @@ function createWindow() {
 
   PythonShell.run("backend/engine.py", null, function (err) {
     if (err) throw err;
-    console.log("finished engine");
   });
 
   // and load the index.html of the app.
