@@ -34,7 +34,9 @@
 
   function handleSelectAll() {
     actions.forEach((action) => {
-      handleActionSelection(action.action_key, action.action_name);
+      // if unchecked, add it
+      var checked = document.getElementById(action.action_key).checked;
+      if (checked) handleActionSelection(action.action_key, action.action_name);
       //$(`${action.action_key}`).prop("checked", true);
     });
     $(`.action_checkbox`).prop("checked", true);
@@ -74,7 +76,7 @@
   }
   function handleActionSelection(actionKey, actionName) {
     const checked = document.getElementById(actionKey).checked;
-    console.log(collectionConfig);
+
     const reps = parseInt(
       document.getElementById(`action-reps-${actionKey}`).value
     );
@@ -94,6 +96,7 @@
       });
     }
     collectionConfig.actions = actions;
+    console.log(actions);
   }
   $(function () {
     fetch("http://127.0.0.1:5000/actions")

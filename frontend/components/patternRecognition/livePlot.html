@@ -4,12 +4,17 @@
     currentRep = 0,
     i = 0;
   var chartdata = [];
-  var actiondata = [];
+  var actiondata = [[], [], [], [], [], [], [], []];
   var labels = [];
   var featuredata = [];
   var FRAME_SIZE = 100;
   var FRAME_SIZE_LIVE = 1;
   ctx = document.getElementById("liveChart");
+
+  function validCollection() {
+    if (collectionConfig.actions.length <= 0) throw "No Actions Selected";
+    if ($("#input-select").val() == "Input") throw "No Input";
+  }
   var myLineChart = new Chart(ctx, {
     type: "line",
     data: {
@@ -74,7 +79,11 @@
   });
 
   function onStart(collect) {
-    console.log("COLLECT", collect, currentTrial);
+    let channels = 0;
+    $('[id^="qc-channel-"]').each(function (i, el) {
+      if ($(this).attr("active") == "true") channels++;
+    });
+    console.log(channels);
     // This function is an accurate interval function
     function AdjustingInterval(workFunc, interval, errorFunc) {
       var that = this;
@@ -140,7 +149,7 @@
             done = true;
             if (collect) appdata.trials[trial][action].reps.push(actiondata);
             currentIteration = 0;
-            actiondata = [];
+            actiondata = [[], [], [], [], [], [], [], []];
             ticker.stop();
           }
           const untilEnd =
@@ -154,11 +163,9 @@
             },
           });
           const reader = $("#input-select").val();
-          fetch(`http://127.0.0.1:5000/read/${reader}`)
+          fetch(`http://127.0.0.1:5000/read/${reader}/${channels}`)
             .then((response) => response.json())
             .then((result) => {
-              console.log("I", i);
-              console.log("Chart Data", chartdata);
               if (chartdata.length > 1000) {
                 chartdata.splice(0, FRAME_SIZE);
                 labels.splice(0, FRAME_SIZE);
@@ -169,13 +176,18 @@
                 featuredata = [];
               }
 
-              result.map((dataPoint) => {
+              //2D array row=channel col=value
+              for (var j = 0; j < channels; j++) {
+                actiondata[j] = actiondata[j].concat(result[j]);
+              }
+
+              result[0].map((dataPoint) => {
                 labels.push(i);
                 chartdata.push({ x: i, y: dataPoint });
-                actiondata.push({ x: i, y: dataPoint });
                 featuredata.push(dataPoint);
                 i++;
               });
+              console.log(chartdata);
 
               //csvdata = csvdata.concat(newData);
               myLineChart.data.datasets[0].data = chartdata;
@@ -190,7 +202,8 @@
     }
 
     // START COLLECTION
-    if (collectionConfig.actions.length > 0) {
+    try {
+      validCollection();
       //Init
       var repCount = collectionConfig.actions[currentAction].reps;
       var trialCount = collectionConfig.trials;
@@ -212,7 +225,6 @@
           setTimeout(checkFlag, FRAME_SIZE);
         } else {
           setStatus(collectionConfig.actions[currentAction].key, true, 0);
-          console.log(currentRep, currentAction, currentTrial);
           currentRep++;
           if (currentRep % repCount == 0 && currentRep != 0) {
             currentRep = 0;
@@ -256,7 +268,6 @@
               () => doWork(currentTrial, currentAction, currentRep),
               FRAME_SIZE
             );
-            console.log("Data", appdata);
             ticker.start();
             setTimeout(checkFlag, FRAME_SIZE);
           } else {
@@ -281,9 +292,9 @@
         }
       }
       checkFlag();
-    } else {
-      console.log("error, select an action");
-      showToast("No actions selected");
+    } catch (e) {
+      console.log(e);
+      showToast(e);
     }
   }
 </script>

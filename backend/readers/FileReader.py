@@ -15,10 +15,12 @@ class FileReader(Reader):
         self.framesize = framesize
         self.data = data['x']
 
-    def read(self):
-        print(self.currentIndex)
+    def read(self, channels):
+        result = []
         print(self.data[self.currentIndex:self.currentIndex + self.framesize])
         next = self.data[self.currentIndex:self.currentIndex +
                          self.framesize].tolist()
         self.currentIndex = self.currentIndex + self.framesize
-        return next
+        for j in range(0, int(channels)):
+            result.insert(j, next)
+        return result

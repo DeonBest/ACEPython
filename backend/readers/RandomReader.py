@@ -16,8 +16,10 @@ class RandomReader(Reader):
         self.framesize = framesize
         self.data = data['x']
 
-    def read(self):
+    def read(self, channels):
         result = []
-        for i in range(0, self.framesize):
-            result.append(random.uniform(-0.5, 0.5))
+        for j in range(0, int(channels)):
+            result.insert(j, [])
+            for i in range(0, self.framesize):
+                result[j].append(random.uniform(-0.5, 0.5))
         return result

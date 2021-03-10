@@ -49,7 +49,6 @@
     });
 
     function setProgressBar(percent, text) {
-      console.log(percent);
       $("#action-progress").html(`${Math.ceil(percent / 10) * 10}%`);
       $("#action-progress").css("width", `${percent}%`);
     }

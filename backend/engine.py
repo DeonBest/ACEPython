@@ -37,11 +37,11 @@ def getReaders():
     return jsonify(list(readerList))
 
 
-@ app.route("/read/<readertype>")
-def read(readertype):
-    print(readertype)
-    result = reader[readertype]['reader'].read()
-    print("R", result)
+@ app.route("/read/<readertype>/<channels>")
+def read(readertype, channels):
+    print(readertype, channels)
+    result = reader[readertype]['reader'].read(channels)
+    print('THE RESULT')
     return jsonify(result)
 
 

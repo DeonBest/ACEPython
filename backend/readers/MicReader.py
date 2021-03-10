@@ -17,14 +17,18 @@ class MicReader(Reader):
     def setInput(self, input):
         print('set input daq' + input)
 
-    def read(self):
+    def read(self, channels):
         """ handles the asynchroneously collected sound chunks """
         # gets the latest frames
         frames = self.mic.get_frames()
+        result = []
         if len(frames) > 0:
             # keeps only the last frame
             current_frame = frames[-1]
             # If given plot, update its data.
-            return current_frame.tolist()
+            for j in range(0, int(channels)):
+                result.insert(j, [])
+                result[j] = current_frame.tolist()
+            return result
 
         return []
