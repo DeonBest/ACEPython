@@ -9,6 +9,7 @@ import numpy as np
 from readers.FileReader import FileReader
 from readers.MicReader import MicReader
 from readers.RandomReader import RandomReader
+from readers.DelsysReader import DelsysReader
 
 app = Flask(__name__)
 
@@ -23,6 +24,9 @@ def init():
                               }
     DAQreader['randomreader'] = {'reader': RandomReader(
         framesize=100), 'name': 'Random'
+    }
+    DAQreader['delsysreader'] = {'reader': DelsysReader(
+        framesize=100), 'name': 'Delsys'
     }
     # Setup File Readers
     filereader['reader'] = FileReader(framesize=100)
