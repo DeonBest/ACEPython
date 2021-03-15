@@ -83,7 +83,7 @@
     $('[id^="qc-channel-"]').each(function (i, el) {
       if ($(this).attr("active") == "true") channels++;
     });
-    console.log(channels);
+
     // This function is an accurate interval function
     function AdjustingInterval(workFunc, interval, errorFunc) {
       var that = this;
@@ -162,7 +162,12 @@
               text: `Recording`,
             },
           });
-          const reader = $("#input-select").val();
+
+          let reader = $("#daq-select").val();
+          if ($("#input-type-daq").is(":checked"))
+            reader = $("#daq-select").val();
+          if ($("#input-type-file").is(":checked")) reader = "file";
+
           fetch(`http://127.0.0.1:5000/read/${reader}/${channels}`)
             .then((response) => response.json())
             .then((result) => {
@@ -187,7 +192,6 @@
                 featuredata.push(dataPoint);
                 i++;
               });
-              console.log(chartdata);
 
               //csvdata = csvdata.concat(newData);
               myLineChart.data.datasets[0].data = chartdata;
@@ -293,7 +297,6 @@
       }
       checkFlag();
     } catch (e) {
-      console.log(e);
       showToast(e);
     }
   }

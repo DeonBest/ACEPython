@@ -24,3 +24,13 @@ class FileReader(Reader):
         for j in range(0, int(channels)):
             result.insert(j, next)
         return result
+
+    def setInput(self, inputFile):
+        file = os.path.realpath(__file__)
+        file = file.split('backend')[0]
+        filepath = 'backend/data/'+inputFile+".csv"
+        data = np.genfromtxt(file+filepath,
+                             delimiter=",", names=["x"])
+        print(file+filepath)
+        self.currentIndex = 0
+        self.data = data['x']

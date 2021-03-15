@@ -23,7 +23,7 @@ if (env === "development") {
     console.log(e);
   }
 }
-
+process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "true";
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({ width: 1000, height: 800 });

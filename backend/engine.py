@@ -12,36 +12,48 @@ from readers.RandomReader import RandomReader
 
 app = Flask(__name__)
 
-reader = {}
+DAQreader = {}
+filereader = {}
 
 
 @app.before_first_request
 def init():
-    print("INIT")
-    reader['filereader'] = {
-        'reader': FileReader(framesize=100), 'name': "File"
-    }
-    reader['micreader'] = {'reader': MicReader(framesize=100), 'name': "Mic"
-                           }
-    reader['randomreader'] = {'reader': RandomReader(
+    # Setup DAQ Readers
+    DAQreader['micreader'] = {'reader': MicReader(framesize=100), 'name': "Mic"
+                              }
+    DAQreader['randomreader'] = {'reader': RandomReader(
         framesize=100), 'name': 'Random'
     }
+    # Setup File Readers
+    filereader['reader'] = FileReader(framesize=100)
     return jsonify(1)
 
 
 @ app.route("/getreaders")
 def getReaders():
     readerList = []
-    for key in reader.keys():
-        readerList.append({'key': key, 'name': reader[key]['name']})
+    for key in DAQreader.keys():
+        readerList.append({'key': key, 'name': DAQreader[key]['name']})
     return jsonify(list(readerList))
 
 
-@ app.route("/read/<readertype>/<channels>")
-def read(readertype, channels):
-    print(readertype, channels)
-    result = reader[readertype]['reader'].read(channels)
+@ app.route("/read/file/<channels>")
+def readFile(channels):
+    result = filereader['reader'].read(channels)
+    return jsonify(result)
+
+
+@ app.route("/read/<daq>/<channels>")
+def readDAQ(daq, channels):
+    print(daq, channels)
+    result = DAQreader[daq]['reader'].read(channels)
     print('THE RESULT')
+    return jsonify(result)
+
+
+@ app.route("/setfileinput/<file>")
+def setFileInput(file):
+    result = filereader['reader'].setInput(file)
     return jsonify(result)
 
 

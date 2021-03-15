@@ -26,7 +26,6 @@
     );
     var inputs = $('[id^="action-reps-"]');
     for (var i = 0; i < inputs.length; i++) {
-      console.log(inputs[i]);
       inputs[i].value = reps;
       reps;
     }
@@ -102,7 +101,6 @@
     fetch("http://127.0.0.1:5000/actions")
       .then((response) => response.json())
       .then((result) => {
-        console.log("R", result);
         actions = result;
         result.map((action) => {
           $("#list").append(`

@@ -114,7 +114,10 @@
     const featureFrame = ($("#time-step").val() * 1000) / INTERVAL_TIME;
 
     function doWork() {
-      const reader = $("#input-select").val();
+      let reader = $("#daq-select").val();
+      console.log($("#input-type-daq").is(":checked"));
+      if ($("#input-type-daq").is(":checked")) reader = $("#daq-select").val();
+      if ($("#input-type-file").is(":checked")) reader = "file";
       fetch(`http://127.0.0.1:5000/read/${reader}/${channels}`)
         .then((response) => response.json())
         .then((result) => {
