@@ -2,6 +2,7 @@ import numpy as np
 import os
 import glob
 from readers.Reader import Reader
+from readers.Reader import ReadError
 import socket
 import sys
 import time
@@ -9,8 +10,9 @@ import numpy as np
 from ast import literal_eval
 
 class DelsysReader(Reader):
-    def __init__(self, framesize=100, hostip="localhost", commandport=50048, emgport=50041, imuport=50042):
+    def __init__(self, framesize=100, hostip="localhost", commandport=50048, emgport=50041, imuport=50042, channels=8):
         self.framesize = framesize
+        self.channels = channels
         self.hostip = hostip
         self.commandport = commandport
         self.emgport = emgport
@@ -60,30 +62,57 @@ class DelsysReader(Reader):
             self.maxSensors * self.IMUChannelCount * 4
         self.result=[]
         self.connect()
-        self.start()
-        self.readEMG()
-        self.stop()
-        self.disconnect()
+
 
     def updateEMGSignal(self, data):
         print("Update EMG", data)
 
     def readEMG(self):
         ind = 0
-        while ind<3:
-            data = self.EMGSocket.recv(self.maxSensors * self.EMGChannelCount * 8)
-            arr = np.frombuffer(data, dtype=np.uint8)
-            arr2= arr.astype(np.float64)
-            datashaped = arr.reshape(self.maxSensors * self.EMGChannelCount, -1)
-            print(datashaped)
-            if(ind is not 0):
-                self.result= np.concatenate((self.result, datashaped.tolist()), axis=1)
-            else:
-                self.result = datashaped.tolist()
-            ind= ind + 1
-    def read(self, channels):
-        print("RESULT", self.result)
-        return self.result.tolist()
+        while True:
+            time.sleep(0.1)
+            try:
+                data = self.EMGSocket.recv(self.maxSensors * self.EMGChannelCount * 8)
+                arr = np.frombuffer(data, dtype=np.uint8)
+                arr2= arr.astype(np.float64)
+                datashaped = arr.reshape(self.maxSensors * self.EMGChannelCount, -1)
+                print(datashaped)
+                if(ind is not 0):
+                    self.result= np.concatenate((self.result, datashaped.tolist()), axis=1)
+                else:
+                    self.result = np.array(datashaped)
+                ind= ind + 1
+            except Exception as e:
+                print(e)
+           
+    def read(self):
+        result = np.array([])
+        ind=0
+        try:
+            while(True):
+                data = self.EMGSocket.recv(self.BufferSize)
+                arr = np.frombuffer(data, dtype=np.float32)
+                arr2= arr
+                extra = len(data) % (self.maxSensors * self.EMGChannelCount)
+                arr = arr[:len(arr)-extra]
+                result = np.append(result, arr)                
+                ind= ind + 1
+              
+        #When no data left on buffer return
+        except Exception as e:
+            dataLength = int(len(result)/16)
+            #16xDatalength array of zeros
+            val=np.zeros((16,dataLength))
+            if(dataLength>0):
+                # For each active sensor, get the data in the appropriate shape (every 16th value)
+                for i in range(0,len(self.activeSensors)):
+                    if(self.activeSensors[i]<8):
+                        print(i, self.activeSensors[i])
+                        val[self.activeSensors[i]-1]=result[self.activeSensors[i]-1:len(result):16]
+                        # Array indexed from 0, sensor n = result[n-1]
+                        print(result[self.activeSensors[i]-1:len(result):16])
+            return val.tolist()
+
 
     def connect(self):
         try:
@@ -106,9 +135,11 @@ class DelsysReader(Reader):
 
             server_address_emg = (self.hostip, self.emgport)
             self.EMGSocket.connect(server_address_emg)
+            self.EMGSocket.setblocking(False)
 
             server_address_imu = (self.hostip, self.imuport)
             self.IMUSocket.connect(server_address_imu)
+            self.IMUSocket.setblocking(False)
 
             self.getHardwareInfo()
         except Exception as e:
@@ -133,15 +164,15 @@ class DelsysReader(Reader):
         start = "START\r\n\r\n"
         self.commandSocket.send(start.encode())
         
-        time.sleep(self.sensorDelay)
-        try:
-            data = self.commandSocket.recv(6).decode('utf-8')
-            print('Start data', data)
-            if 'OK' not in data:
-                print('Unable to stop data collection')
+        time.sleep(self.baseStationDelay)
+
+        data = self.commandSocket.recv(20)
+        print('Start data', data.decode('utf-8'), data)
+        if 'OK' not in data.decode('utf-8'):
+            return False
+
+        return True
                
-        except Exception as e:
-            print(e)
 
     def stop(self):
         if(self.commandSocket == None):
@@ -151,12 +182,19 @@ class DelsysReader(Reader):
         
         time.sleep(self.sensorDelay)
         try:
-            data = self.commandSocket.recv(6).decode('utf-8')
+            data = self.commandSocket.recv(40).decode('utf-8')
             print('Stop data', data)
+            
             if 'OK' not in data:
                 print('Unable to stop data collection')
+                return False
+            else:
+                self.disconnect()
+                return True
         except Exception as e:
             print(e)
+            return False
+
 
     def getHardwareInfo(self):
         print('test')
@@ -196,7 +234,7 @@ class DelsysReader(Reader):
             self.commandSocket.send(msg.encode())
             time.sleep(self.sensorDelay)
             try:
-                data = self.commandSocket.recv(6).decode('utf-8')
+                data = self.commandSocket.recv(7).decode('utf-8')
                 if 'YES' not in data:
                     print(sensorId, 'NOT ACTIVE')
                 else: 

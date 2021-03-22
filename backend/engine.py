@@ -30,6 +30,7 @@ def init():
     }
     # Setup File Readers
     filereader['reader'] = FileReader(framesize=100)
+    print(DAQreader)
     return jsonify(1)
 
 
@@ -38,19 +39,48 @@ def getReaders():
     readerList = []
     for key in DAQreader.keys():
         readerList.append({'key': key, 'name': DAQreader[key]['name']})
+        print(key)
     return jsonify(list(readerList))
 
 
-@ app.route("/read/file/<channels>")
-def readFile(channels):
-    result = filereader['reader'].read(channels)
+@ app.route("/read/file")
+def readFile():
+    result = filereader['reader'].read()
+    return jsonify(result)
+
+@ app.route("/start/file")
+def startFile():
+    result = filereader['reader'].start()
+    print('THE RESULT', result)
+    return jsonify(result)
+
+@ app.route("/stop/file")
+def stopFile(daq):
+    print(daq)
+    result = filereader['reader'].stop()
+    print('THE RESULT')
+    return jsonify(result)
+
+@ app.route("/read/<daq>")
+def readDAQ(daq):
+    print(daq)
+    result = DAQreader[daq]['reader'].read()
+    print('THE RESULT')
+    return jsonify(result)
+
+@ app.route("/start/<daq>")
+def startDAQ(daq):
+    print("START DAQ")
+
+    result = DAQreader[daq]['reader'].start()
+    print('THE RESULT DAQ', result)
     return jsonify(result)
 
 
-@ app.route("/read/<daq>/<channels>")
-def readDAQ(daq, channels):
-    print(daq, channels)
-    result = DAQreader[daq]['reader'].read(channels)
+@ app.route("/stop/<daq>")
+def stopDAQ(daq):
+    print("STOP DAQ")
+    result = DAQreader[daq]['reader'].stop()
     print('THE RESULT')
     return jsonify(result)
 
@@ -65,10 +95,12 @@ def setFileInput(file):
 def datafiles():
     try:
         my_list = []
-        for file in glob.glob(os.path.dirname(os.path.realpath(__file__))+'/data/*.csv'):
-            my_list.append(file)
+        for file in glob.glob(os.path.dirname(os.path.realpath(__file__))+'\data\*.csv'):
+            print(file)
+            my_list.append(str(file))
         return json.dumps(my_list)
     except Exception as e:
+        print('ERRRO')
         return json.dumps(str(e))
 
 

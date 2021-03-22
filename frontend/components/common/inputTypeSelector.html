@@ -10,7 +10,7 @@ $(function () {
           .then((response) => response.json())
           .then((data_files) => {
             for (i = 0; i < data_files.length; i++) {
-              const split = data_files[i].split("/");
+              const split = data_files[i].split("\\");
               file_name = split[split.length - 1];
               $("#file-select").append(
                 $("<option>", {

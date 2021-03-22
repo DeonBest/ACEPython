@@ -39,3 +39,10 @@
   border-width: 1px 1px;
   margin: 20px;
 }
+
+#actionImagePlot {
+  height: 90px;
+  width: 150px;
+  position: absolute;
+  right:0;
+}

@@ -24,7 +24,7 @@
   
 <div>
 <div class="row">
-    <div class="col" id="chart">
+    <div class="col" id="chart" style="overflow-y: scroll;max-height: 50vh; overflow-x: auto;">
       <div id="chart"></div>
     </div>
     <div class="col">
@@ -38,8 +38,8 @@
       </div>
       <div class='streamContainer'>
   
-        <button type="button" class="btn btn-secondary">Record</button>
-        <button type="button" class="btn btn-secondary" onclick="onStart()">
+        <button type="button" class="btn btn-secondary" onclick="onStart(true)">Record</button>
+        <button type="button" class="btn btn-secondary" onclick="onStart(false)">
           Start
         </button>
         <button type="button" class="btn btn-secondary" id="stopBtn">

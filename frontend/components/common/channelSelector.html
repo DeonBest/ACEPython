@@ -13,6 +13,9 @@
           $("button[id^='qc-channel-']").removeClass("btn btn-secondary");
           $("button[id^='qc-channel-']").addClass("btn btn-primary");
           $("button[id^='qc-channel-']").attr("active", "true");
+          for(var i=1;i<=8;i++){
+            $(`#liveChart${i}`).removeAttr('style')
+          }
         }
         break;
       default:
@@ -21,11 +24,13 @@
             .toggleClass("btn btn-primary")
             .toggleClass("btn btn-secondary")
             .attr("active", "false");
+            $(`#plotChannel${channel}`).attr('style', 'display:none')
         } else {
           $(`#qc-channel-${channel}`)
             .toggleClass("btn btn-primary")
             .toggleClass("btn btn-secondary")
             .attr("active", "true");
+           $(`#plotChannel${channel}`).removeAttr('style')
         }
         break;
     }

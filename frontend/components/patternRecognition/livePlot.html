@@ -3,19 +3,28 @@
     currentAction = 0,
     currentRep = 0,
     i = 0;
-  var chartdata = [];
+  var chartdata = [[], [], [], [], [], [], [], []];
   var actiondata = [[], [], [], [], [], [], [], []];
   var labels = [];
   var featuredata = [];
   var FRAME_SIZE = 100;
   var FRAME_SIZE_LIVE = 1;
   ctx = document.getElementById("liveChart");
-
+  function setActionImage(imagePath) {
+    $(`#actionImagePlot`).attr("style", "display:block");
+    $("#actionImagePlot").attr(
+      "src",
+      `../../frontend/images/actions/${imagePath}`
+    );
+  }
+  function hideActionImage() {
+    $(`#actionImagePlot`).attr("style", "display:none");
+  }
   function validCollection() {
     if (collectionConfig.actions.length <= 0) throw "No Actions Selected";
     if ($("#input-select").val() == "Input") throw "No Input";
   }
-  var myLineChart = new Chart(ctx, {
+  var chartConfig = {
     type: "line",
     data: {
       labels: new Array(500).fill(0),
@@ -25,63 +34,86 @@
           pointRadius: 0,
           borderWidth: 1,
           borderColor: "black",
-          fill: false,
-        },
-      ],
+          fill: false
+        }
+      ]
     },
     options: {
       animation: {
-        duration: 0, // general animation time
+        duration: 0 // general animation time
       },
       elements: {
         line: {
-          tension: 0, // disables bezier curves
-        },
+          tension: 0 // disables bezier curves
+        }
       },
       hover: {
-        animationDuration: 0, // duration of animations when hovering an item
+        animationDuration: 0 // duration of animations when hovering an item
       },
       legend: {
-        display: false,
+        display: false
       },
       tooltip: {
-        enabled: false,
+        enabled: false
       },
       layout: {
         padding: {
           left: 0,
           right: 10,
-          top: 50,
-          bottom: 0,
-        },
+          top: 15,
+          bottom: 0
+        }
       },
       responsiveAnimationDuration: 0, // animation duration after a resize
       scales: {
         xAxes: [
           {
-            display: false,
-          },
+            display: false
+          }
         ],
         yAxes: [
           {
             display: true,
             scaleLabel: {
-              display: true,
+              display: true
             },
             ticks: {
               suggestedMin: -0.08,
-              suggestedMax: 0.08,
-            },
-          },
-        ],
-      },
-    },
-  });
+              suggestedMax: 0.08
+            }
+          }
+        ]
+      }
+    }
+  };
+  ctx1 = document.getElementById("liveChart1");
+  ctx2 = document.getElementById("liveChart2");
+  ctx3 = document.getElementById("liveChart3");
+  ctx4 = document.getElementById("liveChart4");
+  ctx5 = document.getElementById("liveChart5");
+  ctx6 = document.getElementById("liveChart6");
+  ctx7 = document.getElementById("liveChart7");
+  ctx8 = document.getElementById("liveChart8");
+  var myLineChart1 = new Chart(ctx1, chartConfig);
+  var myLineChart2 = new Chart(ctx2, chartConfig);
+  var myLineChart3 = new Chart(ctx3, chartConfig);
+  var myLineChart4 = new Chart(ctx4, chartConfig);
+  var myLineChart5 = new Chart(ctx5, chartConfig);
+  var myLineChart6 = new Chart(ctx6, chartConfig);
+  var myLineChart7 = new Chart(ctx7, chartConfig);
+  var myLineChart8 = new Chart(ctx8, chartConfig);
+  // Hide other plots unless selected
+  for (var z = 2; z <= 8; z++)
+    $(`#plotChannel${z}`).attr("style", "display:none");
 
   function onStart(collect) {
     let channels = 0;
-    $('[id^="qc-channel-"]').each(function (i, el) {
-      if ($(this).attr("active") == "true") channels++;
+    let channelsActive = new Array(8).fill(false);
+    $('[id^="qc-channel-"]').each(function(i, el) {
+      if ($(this).attr("active") == "true") {
+        channels++;
+        channelsActive[i] = true;
+      }
     });
 
     // This function is an accurate interval function
@@ -90,12 +122,12 @@
       var expected, timeout;
       this.interval = interval;
 
-      this.start = function () {
+      this.start = function() {
         expected = Date.now() + this.interval;
         timeout = setTimeout(step, this.interval);
       };
 
-      this.stop = function () {
+      this.stop = function() {
         clearTimeout(timeout);
       };
 
@@ -110,11 +142,19 @@
         timeout = setTimeout(step, Math.max(0, that.interval - drift));
       }
     }
-
+    let reader = $("#daq-select").val();
+    if ($("#input-type-daq").is(":checked")) reader = $("#daq-select").val();
+    if ($("#input-type-file").is(":checked")) reader = "file";
     var ticker = null;
-    $("#stopBtn").click(function () {
+    $("#stopBtn").click(function() {
       if (ticker != null) {
+        fetch(`http://127.0.0.1:5000/stop/${reader}`)
+          .then(response => response.json)
+          .then(result => {
+            if (!result) showToast("Error stopping reader");
+          });
         ticker.stop();
+        hideActionImage()
       }
     });
     var currentIteration = 0,
@@ -136,14 +176,16 @@
           const progressToStart =
             ((Date.now() - start) / countdownTimerms) * 100;
           const untilStart = (countdownTimerms - (Date.now() - start)) / 1000;
-          promptWindow.webContents.send("message", {
-            text: "Waiting",
-            progress: {
-              progress: parseInt(progressToStart),
-              text: `Starting in ${parseInt(untilStart) + 1}`,
-            },
-            image: collectionConfig.actions[action].key,
-          });
+          if (promptWindow)
+            promptWindow.webContents.send("message", {
+              text: "Waiting",
+              progress: {
+                progress: parseInt(progressToStart),
+                text: `Starting in ${parseInt(untilStart) + 1}`
+              },
+              image: collectionConfig.actions[action].key
+            });
+            setActionImage(collectionConfig.actions[action].key)
         } else {
           if (currentIteration == iterationLength) {
             done = true;
@@ -154,27 +196,18 @@
           }
           const untilEnd =
             ((Date.now() - (start + countdownTimerms)) / durationms) * 100;
-
-          promptWindow.webContents.send("message", {
-            text: "Recording",
-            progress: {
-              progress: parseInt(untilEnd),
-              text: `Recording`,
-            },
-          });
-
-          let reader = $("#daq-select").val();
-          if ($("#input-type-daq").is(":checked"))
-            reader = $("#daq-select").val();
-          if ($("#input-type-file").is(":checked")) reader = "file";
-
-          fetch(`http://127.0.0.1:5000/read/${reader}/${channels}`)
-            .then((response) => response.json())
-            .then((result) => {
-              if (chartdata.length > 1000) {
-                chartdata.splice(0, FRAME_SIZE);
-                labels.splice(0, FRAME_SIZE);
+          if (promptWindow)
+            promptWindow.webContents.send("message", {
+              text: "Recording",
+              progress: {
+                progress: parseInt(untilEnd),
+                text: `Recording`
               }
+            });
+
+          fetch(`http://127.0.0.1:5000/read/${reader}`)
+            .then(response => response.json())
+            .then(result => {
               //Feature
               if (frame % featureFrame == 0) {
                 onNewFeatureData(featuredata);
@@ -182,24 +215,85 @@
               }
 
               //2D array row=channel col=value
-              for (var j = 0; j < channels; j++) {
+              for (var j = 0; j <= 7; j++) {
                 actiondata[j] = actiondata[j].concat(result[j]);
               }
 
-              result[0].map((dataPoint) => {
-                labels.push(i);
-                chartdata.push({ x: i, y: dataPoint });
-                featuredata.push(dataPoint);
-                i++;
-              });
+              try {
+                if (chartdata.length && result[0].length) {
+                  for (var n = 0; n < result[0].length; n++) {
+                    labels.push(i);
+                    if (labels.length > 1000) {
+                      labels.shift();
+                    }
+                    channelsActive.map((channelActive, channelInd) => {
+                      if (channelActive) {
+                        //console.log(data[channelInd].length,channelInd)
+                        if (chartdata[channelInd].length > 1000) {
+                          chartdata[channelInd].shift();
+                        }
 
-              //csvdata = csvdata.concat(newData);
-              myLineChart.data.datasets[0].data = chartdata;
-              myLineChart.data.labels = labels;
-              myLineChart.update();
-              i++;
+                        chartdata[channelInd].push({
+                          x: i,
+                          y: result[channelInd][n]
+                        });
+                        featuredata.push(result[channelInd][n]);
+                      }
+                    });
+                    i++;
+                  }
+                }
+              } catch (e) {
+                console.log(e);
+                console.log(result);
+                console.log(data);
+              }
+
+              if (channelsActive[0]) {
+                myLineChart1.data.datasets[0].data = chartdata[0];
+                myLineChart1.data.labels = labels;
+                myLineChart1.update();
+              }
+              if (channelsActive[1]) {
+                myLineChart2.data.datasets[0].data = chartdata[1];
+                myLineChart2.data.labels = labels;
+                myLineChart2.update();
+              }
+              if (channelsActive[2]) {
+                myLineChart3.data.datasets[0].data = chartdata[2];
+                myLineChart3.data.labels = labels;
+                myLineChart3.update();
+              }
+              if (channelsActive[3]) {
+                myLineChart4.data.datasets[0].data = chartdata[3];
+                myLineChart4.data.labels = labels;
+                myLineChart4.update();
+              }
+              if (channelsActive[4]) {
+                myLineChart5.data.datasets[0].data = chartdata[4];
+                myLineChart5.data.labels = labels;
+                myLineChart5.update();
+              }
+              if (channelsActive[5]) {
+                myLineChart6.data.datasets[0].data = chartdata[5];
+                myLineChart6.data.labels = labels;
+                myLineChart6.update();
+              }
+              if (channelsActive[6]) {
+                myLineChart7.data.datasets[0].data = chartdata[6];
+                myLineChart7.data.labels = labels;
+                myLineChart7.update();
+              }
+              if (channelsActive[7]) {
+                myLineChart8.data.datasets[0].data = chartdata[7];
+                myLineChart8.data.labels = labels;
+                myLineChart8.update();
+              }
               currentIteration++;
               frame++;
+            })
+            .catch(() => {
+              showToast("Read Error");
             });
         }
       }
@@ -215,15 +309,23 @@
         appdata.trials.push([]);
         appdata.trials[currentTrial].push({
           name: collectionConfig.actions[0].name,
-          reps: [],
+          reps: []
         });
       }
+      fetch(`http://127.0.0.1:5000/start/${reader}`)
+        .then(response => response.json())
+        .then(result => {
+          console.log("start CALL", result);
+          if (result == false) showToast("Error Starting Reader");
+          else {
+            ticker = new AdjustingInterval(
+              () => doWork(currentTrial, currentAction, currentRep),
+              FRAME_SIZE
+            );
+            ticker.start();
+          }
+        });
 
-      ticker = new AdjustingInterval(
-        () => doWork(currentTrial, currentAction, currentRep),
-        FRAME_SIZE
-      );
-      ticker.start();
       function checkFlag() {
         if (done == false) {
           setTimeout(checkFlag, FRAME_SIZE);
@@ -247,7 +349,7 @@
                   appdata.trials.push([]);
                   appdata.trials[currentTrial].push({
                     name: collectionConfig.actions[0].name,
-                    reps: [],
+                    reps: []
                   });
                 }
                 repCount = collectionConfig.actions[0].reps;
@@ -256,7 +358,7 @@
               if (collect)
                 appdata.trials[currentTrial].push({
                   name: collectionConfig.actions[currentAction].name,
-                  reps: [],
+                  reps: []
                 });
               repCount = collectionConfig.actions[currentAction].reps;
             }
@@ -285,13 +387,16 @@
                 (currentIteration = 0),
                 (frame = 0);
             }
-            promptWindow.webContents.send("message", {
-              text: "Done",
-              progress: {
-                progress: parseInt(100),
-                text: `Done`,
-              },
-            });
+            if (promptWindow) {
+              console.log(promptWindow);
+              promptWindow.webContents.send("message", {
+                text: "Done",
+                progress: {
+                  progress: parseInt(100),
+                  text: `Done`
+                }
+              });
+            }
           }
         }
       }
@@ -303,4 +408,38 @@
 </script>
 <!--end polot-->
 
-<canvas id="liveChart"></canvas>
+<div style="position: relative;">
+  <img id="actionImagePlot" src="../../frontend/images/actions/key_grip.jpg" style="display: none;" />
+  <div id="plotChannel1">
+    <h6>Channel 1</h6>
+    <canvas id="liveChart1"></canvas>
+  </div>
+  <div id="plotChannel2">
+    <h6>Channel 2</h6>
+    <canvas id="liveChart2"></canvas>
+  </div>
+  <div id="plotChannel3">
+    <h6>Channel 3</h6>
+    <canvas id="liveChart3"></canvas>
+  </div>
+  <div id="plotChannel4">
+    <h6>Channel 4</h6>
+    <canvas id="liveChart4"></canvas>
+  </div>
+  <div id="plotChannel5">
+    <h6>Channel 5</h6>
+    <canvas id="liveChart5"></canvas>
+  </div>
+  <div id="plotChannel6">
+    <h6>Channel 6</h6>
+    <canvas id="liveChart6"></canvas>
+  </div>
+  <div id="plotChannel7">
+    <h6>Channel 7</h6>
+    <canvas id="liveChart7"></canvas>
+  </div>
+  <div id="plotChannel8">
+    <h6>Channel 8</h6>
+    <canvas id="liveChart8"></canvas>
+  </div>
+</div>

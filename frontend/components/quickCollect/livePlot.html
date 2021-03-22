@@ -1,12 +1,12 @@
 <script type="text/javascript">
   var csvdata = [];
-  var data = [];
+  var data = [[], [], [], [], [], [], [], []];
   var labels = [];
   var featuredata = [];
   var FRAME_SIZE = 100;
   var INTERVAL_TIME = 100;
-  ctx = document.getElementById("liveChart");
-  var myLineChart = new Chart(ctx, {
+
+  var chartConfig = {
     type: "line",
     data: {
       labels: new Array(500).fill(0),
@@ -16,76 +16,107 @@
           pointRadius: 0,
           borderWidth: 1,
           borderColor: "black",
-          fill: false,
-        },
-      ],
+          fill: false
+        }
+      ]
     },
     options: {
       animation: {
-        duration: 0, // general animation time
+        duration: 0 // general animation time
       },
       elements: {
         line: {
-          tension: 0, // disables bezier curves
-        },
+          tension: 0 // disables bezier curves
+        }
       },
       hover: {
-        animationDuration: 0, // duration of animations when hovering an item
+        animationDuration: 0 // duration of animations when hovering an item
       },
       legend: {
-        display: false,
+        display: false
       },
       tooltip: {
-        enabled: false,
+        enabled: false
       },
       layout: {
         padding: {
           left: 0,
           right: 10,
-          top: 50,
-          bottom: 0,
-        },
+          top: 15,
+          bottom: 0
+        }
       },
       responsiveAnimationDuration: 0, // animation duration after a resize
       scales: {
         xAxes: [
           {
-            display: false,
-          },
+            display: false
+          }
         ],
         yAxes: [
           {
             display: true,
             scaleLabel: {
-              display: true,
+              display: true
             },
             ticks: {
               suggestedMin: -0.08,
-              suggestedMax: 0.08,
-            },
-          },
-        ],
-      },
-    },
-  });
+              suggestedMax: 0.08
+            }
+          }
+        ]
+      }
+    }
+  };
+  ctx1 = document.getElementById("liveChart1");
+  ctx2 = document.getElementById("liveChart2");
+  ctx3 = document.getElementById("liveChart3");
+  ctx4 = document.getElementById("liveChart4");
+  ctx5 = document.getElementById("liveChart5");
+  ctx6 = document.getElementById("liveChart6");
+  ctx7 = document.getElementById("liveChart7");
+  ctx8 = document.getElementById("liveChart8");
+  var myLineChart1 = new Chart(ctx1, chartConfig);
+  var myLineChart2 = new Chart(ctx2, chartConfig);
+  var myLineChart3 = new Chart(ctx3, chartConfig);
+  var myLineChart4 = new Chart(ctx4, chartConfig);
+  var myLineChart5 = new Chart(ctx5, chartConfig);
+  var myLineChart6 = new Chart(ctx6, chartConfig);
+  var myLineChart7 = new Chart(ctx7, chartConfig);
+  var myLineChart8 = new Chart(ctx8, chartConfig);
+  // Hide other plots unless selected
+  for (var z = 2; z <= 8; z++)
+    $(`#plotChannel${z}`).attr("style", "display:none");
 
   function onStart() {
+    // ----------------SETUP-------------------------------
     let channels = 0;
-    $('[id^="qc-channel-"]').each(function (i, el) {
-      if ($(this).attr("active") == "true") channels++;
+    let channelsActive = new Array(8).fill(false);
+    $('[id^="qc-channel-"]').each(function(i, el) {
+      if ($(this).attr("active") == "true") {
+        channels++;
+        channelsActive[i] = true;
+      }
     });
+    console.log(channelsActive);
+
+    let reader = $("#daq-select").val();
+    console.log($("#input-type-daq").is(":checked"));
+    if ($("#input-type-daq").is(":checked")) reader = $("#daq-select").val();
+    if ($("#input-type-file").is(":checked")) reader = "file";
+    // ----------------END SETUP-------------------------------
     // This function is an accurate interval function
     function AdjustingInterval(workFunc, interval, errorFunc) {
       var that = this;
       var expected, timeout;
       this.interval = interval;
 
-      this.start = function () {
+      this.start = function() {
         expected = Date.now() + this.interval;
         timeout = setTimeout(step, this.interval);
       };
 
-      this.stop = function () {
+      this.stop = function() {
         clearTimeout(timeout);
       };
 
@@ -102,9 +133,13 @@
     }
 
     var ticker = null;
-    $("#stopBtn").click(function () {
+    $("#stopBtn").click(function() {
       if (ticker != null) {
-        console.log(data);
+        fetch(`http://127.0.0.1:5000/stop/${reader}`)
+          .then(response => response.json)
+          .then(result => {
+            if (!result) showToast("Error stopping reader");
+          });
         ticker.stop();
       }
     });
@@ -114,41 +149,136 @@
     const featureFrame = ($("#time-step").val() * 1000) / INTERVAL_TIME;
 
     function doWork() {
-      let reader = $("#daq-select").val();
-      console.log($("#input-type-daq").is(":checked"));
-      if ($("#input-type-daq").is(":checked")) reader = $("#daq-select").val();
-      if ($("#input-type-file").is(":checked")) reader = "file";
-      fetch(`http://127.0.0.1:5000/read/${reader}/${channels}`)
-        .then((response) => response.json())
-        .then((result) => {
-          if (data.length > 1000) {
-            data.splice(0, FRAME_SIZE);
-            labels.splice(0, FRAME_SIZE);
-          }
+      fetch(`http://127.0.0.1:5000/read/${reader}`)
+        .then(response => response.json())
+        .then(result => {
           //Feature
           if (frame % featureFrame == 0) {
             onNewFeatureData(featuredata);
             featuredata = [];
           }
+          try {
+            if (data.length && result[0].length) {
+              for (var n = 0; n < result[0].length; n++) {
+                labels.push(i);
+                if (labels.length > 1000) {
+                  labels.shift();
+                }
+                channelsActive.map((channelActive, channelInd) => {
+                  if (channelActive) {
+                    //console.log(data[channelInd].length,channelInd)
+                    if (data[channelInd].length > 1000) {
+                      data[channelInd].shift();
+                    }
 
-          result[0].map((dataPoint) => {
-            labels.push(i);
-            data.push({ x: i, y: dataPoint });
-            featuredata.push(dataPoint);
-            i++;
-          });
-          //data.push({ x: i, y: result });
-          //labels.push(i);
-          myLineChart.data.datasets[0].data = data;
-          myLineChart.data.labels = labels;
-          myLineChart.update();
+                    data[channelInd].push({ x: i, y: result[channelInd][n] });
+                    featuredata.push(result[channelInd][n]);
+                  }
+                });
+                i++;
+              }
+            }
+          } catch (e) {
+            console.log(e);
+            console.log(result);
+            console.log(data);
+          }
+          console.log(data[0]);
+
+          if (channelsActive[0]) {
+            myLineChart1.data.datasets[0].data = data[0];
+            myLineChart1.data.labels = labels;
+            myLineChart1.update();
+          }
+          if (channelsActive[1]) {
+            myLineChart2.data.datasets[0].data = data[1];
+            myLineChart2.data.labels = labels;
+            myLineChart2.update();
+          }
+          if (channelsActive[2]) {
+            myLineChart3.data.datasets[0].data = data[2];
+            myLineChart3.data.labels = labels;
+            myLineChart3.update();
+          }
+          if (channelsActive[3]) {
+            myLineChart4.data.datasets[0].data = data[3];
+            myLineChart4.data.labels = labels;
+            myLineChart4.update();
+          }
+          if (channelsActive[4]) {
+            myLineChart5.data.datasets[0].data = data[4];
+            myLineChart5.data.labels = labels;
+            myLineChart5.update();
+          }
+          if (channelsActive[5]) {
+            myLineChart6.data.datasets[0].data = data[5];
+            myLineChart6.data.labels = labels;
+            myLineChart6.update();
+          }
+          if (channelsActive[6]) {
+            myLineChart7.data.datasets[0].data = data[6];
+            myLineChart7.data.labels = labels;
+            myLineChart7.update();
+          }
+          if (channelsActive[7]) {
+            myLineChart8.data.datasets[0].data = data[7];
+            myLineChart8.data.labels = labels;
+            myLineChart8.update();
+          }
+
           frame++;
+        })
+        .catch(e => {
+          console.log("ERRO", e);
+          showToast("Read Error");
+          ticker.stop();
         });
     }
-    ticker = new AdjustingInterval(doWork, INTERVAL_TIME);
-    ticker.start();
+
+    fetch(`http://127.0.0.1:5000/start/${reader}`)
+      .then(response => response.json())
+      .then(result => {
+        console.log("start CALL", result);
+        if (result == false) showToast("Error Starting Reader");
+        else {
+          ticker = new AdjustingInterval(doWork, INTERVAL_TIME);
+          ticker.start();
+        }
+      });
   }
 </script>
 <!--end polot-->
-
-<canvas id="liveChart"></canvas>
+<div>
+  <div id="plotChannel1">
+    <h6>Channel 1</h6>
+    <canvas id="liveChart1"></canvas>
+  </div>
+  <div id="plotChannel2">
+    <h6>Channel 2</h6>
+    <canvas id="liveChart2"></canvas>
+  </div>
+  <div id="plotChannel3">
+    <h6>Channel 3</h6>
+    <canvas id="liveChart3"></canvas>
+  </div>
+  <div id="plotChannel4">
+    <h6>Channel 4</h6>
+    <canvas id="liveChart4"></canvas>
+  </div>
+  <div id="plotChannel5">
+    <h6>Channel 5</h6>
+    <canvas id="liveChart5"></canvas>
+  </div>
+  <div id="plotChannel6">
+    <h6>Channel 6</h6>
+    <canvas id="liveChart6"></canvas>
+  </div>
+  <div id="plotChannel7">
+    <h6>Channel 7</h6>
+    <canvas id="liveChart7"></canvas>
+  </div>
+  <div id="plotChannel8">
+    <h6>Channel 8</h6>
+    <canvas id="liveChart8"></canvas>
+  </div>
+</div>
