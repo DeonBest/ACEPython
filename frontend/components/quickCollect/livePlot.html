@@ -1,73 +1,80 @@
+<!-- Live Plot Component (Quick Collect)-->
+<!-- Author: Evan Larkin-->
+<!-- Date: March 2021-->
 <script type="text/javascript">
-  var csvdata = [];
+  // Data from the collection 8 x N
   var data = [[], [], [], [], [], [], [], []];
+  // Labels required for the plot (x-axis). Equal to the data point number of the recording.
   var labels = [];
+  // Data that will be used to calculate the feature. Reset every interval
   var featuredata = [];
+  // Time (ms) between data fetches and plot update
   var FRAME_SIZE = 100;
-  var INTERVAL_TIME = 100;
 
+  // Configuration of the chart (ChartJS: https://www.chartjs.org/)
   var chartConfig = {
     type: "line",
     data: {
       labels: new Array(500).fill(0),
       datasets: [
         {
-          data: csvdata,
+          data: [],
           pointRadius: 0,
           borderWidth: 1,
           borderColor: "black",
-          fill: false
-        }
-      ]
+          fill: false,
+        },
+      ],
     },
     options: {
       animation: {
-        duration: 0 // general animation time
+        duration: 0, // general animation time
       },
       elements: {
         line: {
-          tension: 0 // disables bezier curves
-        }
+          tension: 0, // disables bezier curves
+        },
       },
       hover: {
-        animationDuration: 0 // duration of animations when hovering an item
+        animationDuration: 0, // duration of animations when hovering an item
       },
       legend: {
-        display: false
+        display: false,
       },
       tooltip: {
-        enabled: false
+        enabled: false,
       },
       layout: {
         padding: {
           left: 0,
           right: 10,
           top: 15,
-          bottom: 0
-        }
+          bottom: 0,
+        },
       },
       responsiveAnimationDuration: 0, // animation duration after a resize
       scales: {
         xAxes: [
           {
-            display: false
-          }
+            display: false,
+          },
         ],
         yAxes: [
           {
             display: true,
             scaleLabel: {
-              display: true
+              display: true,
             },
             ticks: {
               suggestedMin: -0.08,
-              suggestedMax: 0.08
-            }
-          }
-        ]
-      }
-    }
+              suggestedMax: 0.08,
+            },
+          },
+        ],
+      },
+    },
   };
+  // Apply charts to all the HTML below
   ctx1 = document.getElementById("liveChart1");
   ctx2 = document.getElementById("liveChart2");
   ctx3 = document.getElementById("liveChart3");
@@ -84,39 +91,47 @@
   var myLineChart6 = new Chart(ctx6, chartConfig);
   var myLineChart7 = new Chart(ctx7, chartConfig);
   var myLineChart8 = new Chart(ctx8, chartConfig);
-  // Hide other plots unless selected
+  // Hide plots 2-8 until selected by user
   for (var z = 2; z <= 8; z++)
     $(`#plotChannel${z}`).attr("style", "display:none");
 
+  /* 
+    On data collection start
+  */
   function onStart() {
-    // ----------------SETUP-------------------------------
+    // Which channels are active (selected by the user)
     let channels = 0;
     let channelsActive = new Array(8).fill(false);
-    $('[id^="qc-channel-"]').each(function(i, el) {
+    $('[id^="qc-channel-"]').each(function (i, el) {
       if ($(this).attr("active") == "true") {
         channels++;
         channelsActive[i] = true;
       }
     });
-    console.log(channelsActive);
 
+    // Determine the reader selected
     let reader = $("#daq-select").val();
     console.log($("#input-type-daq").is(":checked"));
     if ($("#input-type-daq").is(":checked")) reader = $("#daq-select").val();
     if ($("#input-type-file").is(":checked")) reader = "file";
-    // ----------------END SETUP-------------------------------
-    // This function is an accurate interval function
+
+    /* 
+      This function is an accurate interval function, accounting for drift
+      Args: workFunc(function): a function that is called on every interval
+            interval(int): interval time (ms)
+            errorFunc(function): called when an error occurs during execution
+    */
     function AdjustingInterval(workFunc, interval, errorFunc) {
       var that = this;
       var expected, timeout;
       this.interval = interval;
 
-      this.start = function() {
+      this.start = function () {
         expected = Date.now() + this.interval;
         timeout = setTimeout(step, this.interval);
       };
 
-      this.stop = function() {
+      this.stop = function () {
         clearTimeout(timeout);
       };
 
@@ -133,30 +148,38 @@
     }
 
     var ticker = null;
-    $("#stopBtn").click(function() {
+
+    // On collection stop
+    $("#stopBtn").click(function () {
       if (ticker != null) {
         fetch(`http://127.0.0.1:5000/stop/${reader}`)
-          .then(response => response.json)
-          .then(result => {
+          .then((response) => response.json)
+          .then((result) => {
             if (!result) showToast("Error stopping reader");
           });
         ticker.stop();
       }
     });
 
+    // Do work initialization
     var i = 0;
     var frame = 0;
-    const featureFrame = ($("#time-step").val() * 1000) / INTERVAL_TIME;
+    const featureFrame = ($("#time-step").val() * 1000) / FRAME_SIZE;
 
+    /* 
+      This function is passed to the interval function, ran every x ms
+    */
     function doWork() {
       fetch(`http://127.0.0.1:5000/read/${reader}`)
-        .then(response => response.json())
-        .then(result => {
-          //Feature
+        .then((response) => response.json())
+        .then((result) => {
+          // Time to log the selected feature
           if (frame % featureFrame == 0) {
             onNewFeatureData(featuredata);
             featuredata = [];
           }
+
+          //Format the data for plotting
           try {
             if (data.length && result[0].length) {
               for (var n = 0; n < result[0].length; n++) {
@@ -183,8 +206,8 @@
             console.log(result);
             console.log(data);
           }
-          console.log(data[0]);
 
+          // Update the plot data for all active channels
           if (channelsActive[0]) {
             myLineChart1.data.datasets[0].data = data[0];
             myLineChart1.data.labels = labels;
@@ -228,26 +251,27 @@
 
           frame++;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log("ERRO", e);
           showToast("Read Error");
           ticker.stop();
         });
     }
 
+    // Start the reader to prepare for collection
     fetch(`http://127.0.0.1:5000/start/${reader}`)
-      .then(response => response.json())
-      .then(result => {
+      .then((response) => response.json())
+      .then((result) => {
         console.log("start CALL", result);
         if (result == false) showToast("Error Starting Reader");
         else {
-          ticker = new AdjustingInterval(doWork, INTERVAL_TIME);
+          ticker = new AdjustingInterval(doWork, FRAME_SIZE);
           ticker.start();
         }
       });
   }
 </script>
-<!--end polot-->
+
 <div>
   <div id="plotChannel1">
     <h6>Channel 1</h6>

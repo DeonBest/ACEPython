@@ -1,3 +1,7 @@
+/* 
+  Defines all available features and how to calculate them
+  Each element in the array requires the format {name:string, calculate:function}
+*/
 const features = [
   {
     name: "MAV",

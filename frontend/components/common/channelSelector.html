@@ -1,7 +1,11 @@
+<!-- Channel Selector Component-->
+<!-- Author: Evan Larkin-->
+<!-- Date: March 2021-->
 <script type="text/javascript">
   /*
     Handle toggling of the enabled channels
-*/
+    Triggers appropriate plots to be displayed
+  */
   function onChannelToggle(channel) {
     switch (channel) {
       case "all":
@@ -13,8 +17,8 @@
           $("button[id^='qc-channel-']").removeClass("btn btn-secondary");
           $("button[id^='qc-channel-']").addClass("btn btn-primary");
           $("button[id^='qc-channel-']").attr("active", "true");
-          for(var i=1;i<=8;i++){
-            $(`#liveChart${i}`).removeAttr('style')
+          for (var i = 1; i <= 8; i++) {
+            $(`#liveChart${i}`).removeAttr("style");
           }
         }
         break;
@@ -24,13 +28,13 @@
             .toggleClass("btn btn-primary")
             .toggleClass("btn btn-secondary")
             .attr("active", "false");
-            $(`#plotChannel${channel}`).attr('style', 'display:none')
+          $(`#plotChannel${channel}`).attr("style", "display:none");
         } else {
           $(`#qc-channel-${channel}`)
             .toggleClass("btn btn-primary")
             .toggleClass("btn btn-secondary")
             .attr("active", "true");
-           $(`#plotChannel${channel}`).removeAttr('style')
+          $(`#plotChannel${channel}`).removeAttr("style");
         }
         break;
     }

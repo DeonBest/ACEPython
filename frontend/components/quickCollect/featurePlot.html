@@ -1,6 +1,12 @@
+<!-- Feature Plot-->
+<!-- Author: Evan Larkin-->
+<!-- Date: March 2021-->
 <script type="text/javascript">
+  // Data currently on the plot
   var plotdata = [];
+  // Label data (x-axis). Equal to the data point number
   var labeldata = [];
+  // Load chart into the HTML below
   ctx = document.getElementById("featurePlot");
   var myFeaturePlot = new Chart(ctx, {
     type: "line",
@@ -63,6 +69,11 @@
       array.reduce((a, b) => a + b, 0) / array.length);
   }
 
+  /*
+    This function checks the current feature selection, computes its value
+    and adds the new value to the plot. Triggered in livePlot.js.
+    Args: data(array)=> data that is used to calculate the feature value
+  */
   function onNewFeatureData(data) {
     if ($("#feature-select option:selected").text() !== "None" && data.length) {
       const featureFunction = features.find(

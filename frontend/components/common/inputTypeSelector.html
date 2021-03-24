@@ -1,9 +1,12 @@
+<!-- Input Type Selector Component-->
+<!-- Author: Evan Larkin-->
+<!-- Date: February 2021-->
 <script type='text/javascript'>
 $(function () {
+      
       /*
-            Populate Dropdowns/Fetch Data
+        Fetch Data and populate dropdowns for readers and data files
       */
-
       setTimeout(() => {
         //CSV Files
         fetch("http://127.0.0.1:5000/datafiles")
@@ -35,7 +38,7 @@ $(function () {
             }
           });
 
-      }, 1000);
+      }, 1000); //Brief timeout to allow page to mount
     });
 
 
