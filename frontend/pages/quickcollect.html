@@ -38,6 +38,8 @@
   <script src="../javascript/features.js"></script>
 
   <script type="text/javascript">
+    // Holds data if recorded
+    let appdata = [[],[],[],[],[],[],[],[]]
     /*
           Run this function on load
         */
@@ -66,7 +68,7 @@
     <div class="container">
       <!--The chart-->
       <div class="row">
-        <div class="col" id="chart" style="overflow-y: scroll;max-height: 50vh; overflow-x: auto;">
+        <div class="col" id="chart">
           <div id="chart"></div>
         </div>
         <div class="col">
@@ -79,11 +81,11 @@
               <h4>Stream</h4>
             </div>
             <div class="streamContainer">
-              <button type="button" class="btn btn-secondary">Record</button>
+              <button type="button" class="btn btn-secondary" onclick="onStart(true)">Record</button>
               <button
                 type="button"
                 class="btn btn-secondary"
-                onclick="onStart()"
+                onclick="onStart(false)"
               >
                 Start
               </button>
