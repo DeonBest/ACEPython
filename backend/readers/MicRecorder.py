@@ -46,8 +46,11 @@ class MicrophoneRecorder(object):
 
     def new_frame(self, data, frame_count, time_info, status):
         data = np.fromstring(data, dtype=np.int16)
+        # make output -1 to 1 from -32767 to 32767
+        dataConverted = np.array([x / 32767 for x in data])
+        print()
         with self.lock:
-            self.frames.append(data)
+            self.frames.append(dataConverted)
             if self.stop:
                 return None, pyaudio.paComplete
         return None, pyaudio.paContinue

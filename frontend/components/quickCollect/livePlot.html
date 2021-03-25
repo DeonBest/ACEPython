@@ -132,7 +132,7 @@
   /* 
     On data collection start
   */
-  function onStart() {
+  function onStart(collect) {
     // Which channels are active (selected by the user)
     let channels = 0;
     let channelsActive = new Array(8).fill(false);
@@ -212,6 +212,13 @@
               myLineChart1.data.datasets[i].hidden = true;
             }
           });
+
+          // If recording, save the data
+          if(collect){
+            for (var j = 0; j <= 7; j++) {
+                appdata[j] = appdata[j].concat(result[j]);
+              }
+          }
 
           // Time to log the selected feature
           if (frame % featureFrame == 0) {
