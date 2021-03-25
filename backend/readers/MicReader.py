@@ -1,10 +1,27 @@
+"""
+    Mic Reader
+    This reads data from the Mic Recorder.
+    The data returned is adjusted to values between -1 and 1.
+
+    Author: Evan Larkin
+    Date: February 2021
+"""
 from readers.Reader import Reader
 import numpy as np
 from readers.MicRecorder import MicrophoneRecorder
 
 
 class MicReader(Reader):
-    def __init__(self, framesize, channels=8):
+    """
+        Initialize the reader
+        Args:
+            framesize: Number of data points returned per read
+                Default => 100
+            channels: Number of channels returned during read
+                Default => 8
+    """
+
+    def __init__(self, framesize=100, channels=8):
         mic = MicrophoneRecorder(framesize=framesize)
 
         # keeps reference to mic
@@ -16,16 +33,22 @@ class MicReader(Reader):
     def setInput(self, input):
         print('set input daq' + input)
 
+    """
+        Start the reader
+    """
+
     def start(self):
-        # No start setup required
         try:
             self.mic.start()
             return True
         except Exception as e:
             return False
 
+    """
+        Stop the reader
+    """
+
     def stop(self):
-        # No Stop setup required
         return True
 
     def read(self):

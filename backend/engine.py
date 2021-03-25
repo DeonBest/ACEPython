@@ -1,3 +1,10 @@
+"""
+The main API Class
+
+Contains the endpoints accessible from localhost:5000
+Author: Evan Larkin 
+Date: Jan 2021
+"""
 import sys
 from flask import Flask, jsonify, g, session
 import json
@@ -13,25 +20,45 @@ from readers.DelsysReader import DelsysReader
 
 app = Flask(__name__)
 
+# These global variables hold instances of the readers
+# Accessible from all endpoints
 DAQreader = {}
 filereader = {}
+
+"""
+This is called once before any other request is sent. It initializes the
+readers in the global variable at their respective key. 
+
+DAQReader:{
+    <readername>:{
+        reader: the reader instatiation
+        name: Name of the reader that will be used for selection in frontend
+    }
+}
+FileReader:{
+    reader: the reader instatiation
+}
+"""
 
 
 @app.before_first_request
 def init():
     # Setup DAQ Readers
-    DAQreader['micreader'] = {'reader': MicReader(framesize=100), 'name': "Mic"
-                              }
-    DAQreader['randomreader'] = {'reader': RandomReader(
-        framesize=100), 'name': 'Random'
-    }
-    DAQreader['delsysreader'] = {'reader': DelsysReader(
-        framesize=100), 'name': 'Delsys'
-    }
-    # Setup File Readers
-    filereader['reader'] = FileReader(framesize=100)
-    print(DAQreader)
+    DAQreader['micreader'] = {'reader': MicReader(), 'name': "Mic"}
+    DAQreader['randomreader'] = {'reader': RandomReader(), 'name': 'Random'}
+    DAQreader['delsysreader'] = {'reader': DelsysReader(), 'name': 'Delsys'}
+    # Setup File Reader
+    filereader['reader'] = FileReader()
+
     return jsonify(1)
+
+
+"""
+/getreaders
+
+This retrieves the list of readers available and instantiated.
+
+"""
 
 
 @ app.route("/getreaders")
@@ -43,10 +70,27 @@ def getReaders():
     return jsonify(list(readerList))
 
 
+"""
+/read/file
+
+This retrieves the next set of data from the file being read.
+
+"""
+
+
 @ app.route("/read/file")
 def readFile():
     result = filereader['reader'].read()
     return jsonify(result)
+
+
+"""
+/start/file
+
+This completes any setup required before reading can occur.
+
+"""
+
 
 @ app.route("/start/file")
 def startFile():
@@ -54,12 +98,29 @@ def startFile():
     print('THE RESULT', result)
     return jsonify(result)
 
+
+"""
+/stop/file
+
+This stops any processes required once reading has completed.
+
+"""
+
+
 @ app.route("/stop/file")
-def stopFile(daq):
-    print(daq)
+def stopFile():
     result = filereader['reader'].stop()
     print('THE RESULT')
     return jsonify(result)
+
+
+"""
+/read/<daq>
+
+This retrieves the next set of data from the selected reader.
+Params: daq - the key to the selected reader
+"""
+
 
 @ app.route("/read/<daq>")
 def readDAQ(daq):
@@ -67,6 +128,15 @@ def readDAQ(daq):
     result = DAQreader[daq]['reader'].read()
     print('THE RESULT')
     return jsonify(result)
+
+
+"""
+/start/<daq>
+
+This completes any setup required before reading can occur.
+Params: daq - the key to the selected reader
+"""
+
 
 @ app.route("/start/<daq>")
 def startDAQ(daq):
@@ -77,6 +147,14 @@ def startDAQ(daq):
     return jsonify(result)
 
 
+"""
+/stop/<daq>
+
+This stops any processes required once reading has completed.
+Params: daq - the key to the selected reader
+"""
+
+
 @ app.route("/stop/<daq>")
 def stopDAQ(daq):
     print("STOP DAQ")
@@ -85,10 +163,25 @@ def stopDAQ(daq):
     return jsonify(result)
 
 
+"""
+/setfileinput/<file>
+
+This sets the file that will be read from the filereader.
+Params: file - the name of the file selected
+"""
+
+
 @ app.route("/setfileinput/<file>")
 def setFileInput(file):
     result = filereader['reader'].setInput(file)
     return jsonify(result)
+
+
+"""
+/datafiles
+
+This retrieves the data files that can be read. Files are in /data/.
+"""
 
 
 @ app.route("/datafiles")
@@ -100,8 +193,15 @@ def datafiles():
             my_list.append(str(file))
         return json.dumps(my_list)
     except Exception as e:
-        print('ERRRO')
         return json.dumps(str(e))
+
+
+"""
+/actions
+
+This retrieves the actions files that can be completed for data collection.
+Actions are in ../frontend/images/actions/
+"""
 
 
 @ app.route("/actions")
@@ -119,31 +219,6 @@ def actions():
         }
         my_list.append(action)
     return json.dumps(my_list)
-
-
-@ app.route("/readarr")
-def readarr():
-    return jsonify(random.uniform(-0.5, 0.5))
-
-
-@ app.route("/readarr2")
-def readarr2():
-    return jsonify(random.randint(0, 10))
-
-
-@ app.route('/readcsv/<filename>')
-def readcsv(filename, frame=0):
-    file = glob.glob(os.path.dirname(
-        os.path.realpath(__file__))+'/data/'+filename)
-    data = np.genfromtxt(str(file[0]), delimiter=",", names=["x"])
-    datax = data['x']
-
-    def getData():
-        try:
-            return json.dumps(datax.tolist())
-        except Exception as e:
-            return json.dumps(str(e))
-    return getData()
 
 
 if __name__ == "__main__":
