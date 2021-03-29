@@ -1,10 +1,12 @@
-# electron-quick-start
+# ACE Python 2021
 
-**Clone and run for a quick way to see Electron in action.**
+This is the repository for the 2021 Redesign of the ACE software system, used for EMG collection and classification for UNB ECE Department of Biomedical Engineering.
 
-This is a minimal Electron application based on the [Quick Start Guide](https://electronjs.org/docs/tutorial/quick-start) within the Electron documentation.
+## Background
 
-**Use this app along with the [Electron API Demos](https://electronjs.org/#get-started) app for API code examples to help you get started.**
+This project is build with the electron framework. Electron is a framework that is used to built cross-platform desktop applications using web technologies. It combines the chromium rendering engine and the node.js runtime. We have implemented our project with a frontend of HTML, JS, and CSS, and a backend as a python flask api.
+Electron: https://www.electronjs.org/docs
+Python Flask: https://flask.palletsprojects.com/en/1.1.x/
 
 A basic Electron application needs just these files:
 
@@ -14,17 +16,27 @@ A basic Electron application needs just these files:
 
 You can learn more about each of these components within the [Quick Start Guide](https://electronjs.org/docs/tutorial/quick-start).
 
-## To Use
 
-To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
+## Requirements
+
+To run this application for development you will need the following installations
+
+To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. [Python 3.7](https://www.python.org/downloads/) and Pip3 are required for the python backend. 
+Versions Used For Development:
+NodeJs: v14.13.0
+npm: v6.14.9
+Python: v3.9.0
+Pip: v20.3.1 (Python 3.9)
+**From your command line:**
 
 ```bash
 # Clone this repository
-git clone https://github.com/electron/electron-quick-start
+git clone <http://path-to-repo>
 # Go into the repository
-cd electron-quick-start
+cd ACEPython
 # Install dependencies
 npm install
+cd backend && pip install -r requirements.txt
 # Run the app
 npm start
 ```
@@ -39,16 +51,6 @@ Note: If you're using Linux Bash for Windows, [see this guide](https://www.howto
 - [electron/simple-samples](https://github.com/electron/simple-samples) - small applications with ideas for taking them further
 - [electron/electron-api-demos](https://github.com/electron/electron-api-demos) - an Electron app that teaches you how to use Electron
 - [hokein/electron-sample-apps](https://github.com/hokein/electron-sample-apps) - small demo apps for the various Electron APIs
-
-# ACE Python 2021
-
-This is the repository for the 2021 Redesign of the ACE software system, used for EMG collection and classification for UNB ECE Department of Biomedical Engineering.
-
-## Background
-
-This project is build with the electron framework. Electron is a framework that is used to built cross-platform desktop applications using web technologies. It combines the chromium rendering engine and the node.js runtime. We have implemented our project with a frontend of HTML, JS, and CSS, and a backend as a python flask api.
-Electron: https://www.electronjs.org/docs
-Python Flask: https://flask.palletsprojects.com/en/1.1.x/
 
 ## Frontend
 
@@ -107,24 +109,16 @@ Data files that can be used as input can be stored in backend/data. They must be
 The list of actions is determined from the images in the frontend/images/actions directory. To add an action, simply add an image to the directory. The name that will be displayed will pulled from the file name, so keep naming consistent.
 
 ## Building
-
-## Requirements
-
-To run this application for development you will need the following installations
-NodeJS: https://nodejs.org/en/download/
-npm: https://www.npmjs.com/get-npm
-Python 3.7: https://www.python.org/downloads/
-Build Requirements:
-From the root directory.
-Python :
-
+To build a standalone Desktop app for this project.
+Note: The backend must be built before the frontend. Building the electron app must have a built version of the backend to use for the standalone application.
+```bash
+# Build the backend
+ #Windows
+  npm run build-backend-windows
+ #Mac
+  npm run build-backend-mac
+# Build the frontend
+npm run build-frontend
 ```
-cd backend
-pip install -r requirements.txt
-```
-
-Node Packages
-
-```
-npm install
-```
+The backend is built by [pyinstaller](https://www.pyinstaller.org/) and stored in backend/pyenginedist
+The frontend is built by [electron-packager](https://github.com/electron/electron-packager) and stored in the root directory at ace-darwin-x64 (mac) and ace-win32-x64(windows). The respective executable is found inside.
