@@ -10,6 +10,11 @@ Release.key
 /tmp
 /out-tsc
 
+#build
+ace-darwin-x64/*
+backend/build/*
+backend/__pycache__/*
+backend/pyenginedist
 # dependencies
 /node_modules
 /stuff

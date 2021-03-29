@@ -3,8 +3,9 @@ import time
 string = 'testing %d val' % 10
 import numpy as np
 from datetime import datetime
-print(requests.get('http://127.0.0.1:5000/getreaders').json())
-print('SETUP')
+print(requests.get('http://127.0.0.1:5000/test').json())
+#print(requests.get('http://127.0.0.1:5000/datafiles').json())
+
 
 """
 while(True):

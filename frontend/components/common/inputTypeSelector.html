@@ -3,17 +3,22 @@
 <!-- Date: February 2021-->
 <script type='text/javascript'>
 $(function () {
-      
       /*
         Fetch Data and populate dropdowns for readers and data files
       */
       setTimeout(() => {
+        
         //CSV Files
         fetch("http://127.0.0.1:5000/datafiles")
           .then((response) => response.json())
           .then((data_files) => {
             for (i = 0; i < data_files.length; i++) {
-              const split = data_files[i].split("\\");
+              //Mac
+              let split = data_files[i].split("data/");
+              //Windows
+              if(navigator.platform.indexOf('Win') > -1){
+                split = data_files[i].split("\\");
+              }
               file_name = split[split.length - 1];
               $("#file-select").append(
                 $("<option>", {

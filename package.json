@@ -4,7 +4,9 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build-frontend": "./node_modules/.bin/electron-packager . --overwrite",
+    "build-backend": "cd backend && pyinstaller engine.py --distpath pyenginedist --add-data data/*.csv:data"
   },
   "repository": "",
   "keywords": [
@@ -17,11 +19,12 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^3.0.7",
+    "electron": "^10.1.5",
     "electron-reload": "^1.5.0",
     "electron-reloader": "^1.1.0"
   },
   "dependencies": {
+    "electron-packager": "^15.2.0",
     "node-fetch": "^2.6.1",
     "python-shell": "^1.0.6"
   }

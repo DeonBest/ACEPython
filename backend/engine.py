@@ -13,11 +13,11 @@ import json
 import os
 import random
 import numpy as np
-from readers.FileReader import FileReader
-from readers.MicReader import MicReader
-from readers.RandomReader import RandomReader
-from readers.DelsysReader import DelsysReader
-
+from readers import FileReader
+from readers import MicReader
+from readers import RandomReader
+from readers import DelsysReader
+import platform
 app = Flask(__name__)
 
 # These global variables hold instances of the readers
@@ -40,17 +40,34 @@ FileReader:{
 }
 """
 
-
 @app.before_first_request
 def init():
     # Setup DAQ Readers
-    DAQreader['micreader'] = {'reader': MicReader(), 'name': "Mic"}
-    DAQreader['randomreader'] = {'reader': RandomReader(), 'name': 'Random'}
-    DAQreader['delsysreader'] = {'reader': DelsysReader(), 'name': 'Delsys'}
+    DAQreader['micreader'] = {'reader': MicReader.MicReader(), 'name': "Mic"}
+    DAQreader['randomreader'] = {'reader': RandomReader.RandomReader(), 'name': 'Random'}
+    try:
+        DAQreader['delsysreader'] = {'reader': DelsysReader.DelsysReader(), 'name': 'Delsys'}
+    except Exception as e:
+        print("ERROR With Delsys")
+    
     # Setup File Reader
-    filereader['reader'] = FileReader()
+    filereader['reader'] = FileReader.FileReader()
 
     return jsonify(1)
+
+"""
+This retrieves the path for the data files. When the application is built they are stored in temp 
+folder at path stored in env variable _MEIPASS. Otherwise they are found in /data/*
+"""
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+        print(base_path)
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 
 """
@@ -59,7 +76,6 @@ def init():
 This retrieves the list of readers available and instantiated.
 
 """
-
 
 @ app.route("/getreaders")
 def getReaders():
@@ -188,8 +204,12 @@ This retrieves the data files that can be read. Files are in /data/.
 def datafiles():
     try:
         my_list = []
-        for file in glob.glob(os.path.dirname(os.path.realpath(__file__))+'\data\*.csv'):
-            print(file)
+        # Mac or Linux
+        path = resource_path('data/*.csv')
+        if(platform.system()=='Windows'):
+            path = resource_path('data\*.csv')
+
+        for file in glob.glob(path):
             my_list.append(str(file))
         return json.dumps(my_list)
     except Exception as e:
@@ -220,6 +240,7 @@ def actions():
         my_list.append(action)
     return json.dumps(my_list)
 
-
+def main():
+    app.run(host='127.0.0.1', port=5000)
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5000)
