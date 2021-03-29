@@ -5,3 +5,4 @@ lxml
 pyusb
 pyaudio
 flask-script
+pyinstaller

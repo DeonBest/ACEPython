@@ -12,9 +12,11 @@ Release.key
 
 #build
 ace-darwin-x64/*
+ace-win32-x64/*
 backend/build/*
 backend/__pycache__/*
 backend/pyenginedist
+backend/engine.spec
 # dependencies
 /node_modules
 /stuff

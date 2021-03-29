@@ -6,7 +6,8 @@
   "scripts": {
     "start": "electron .",
     "build-frontend": "./node_modules/.bin/electron-packager . --overwrite",
-    "build-backend": "cd backend && pyinstaller engine.py --distpath pyenginedist --add-data data/*.csv:data"
+    "build-backend-mac": "cd backend && pyinstaller engine.py --distpath pyenginedist --add-data data/*.csv:data",
+    "build-backend-windows": "cd backend && pyinstaller engine.py --distpath pyenginedist --add-data data\\*.csv;data"
   },
   "repository": "",
   "keywords": [
