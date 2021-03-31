@@ -256,7 +256,8 @@
           if (!collectionComplete) {
             ticker.stop();
             start = Date.now();
-            done = false;
+            //done = false;
+            done = true;
             ticker = new AdjustingInterval(
               () => doWork(currentTrial, currentAction, currentRep),
               FRAME_SIZE

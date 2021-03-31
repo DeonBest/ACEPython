@@ -22,6 +22,13 @@
     "electron-reloader": "^1.1.0"
   },
   "dependencies": {
+    "chart.js": "^2.9.4",
+    "convert-csv-to-array": "^1.0.3",
+    "csv": "^5.4.0",
+    "csv-parser": "^3.0.0",
+    "csv-to-array": "^1.0.2",
+    "csvtojson": "^2.0.10",
+    "papaparse": "^5.3.0",
     "python-shell": "^1.0.6"
   }
 }

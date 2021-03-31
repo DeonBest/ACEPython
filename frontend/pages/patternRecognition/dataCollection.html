@@ -1,3 +1,4 @@
+
 <script type="text/javascript">
     $(function () {
        /*
@@ -10,12 +11,15 @@
       $('#actionContainer').load("../../components/patternRecognition/actionSelector.html")
       $('#collectionSettings').load("../../components/patternRecognition/collectionSettings.html")
       $('#promptView').load("../../components/patternRecognition/promptView.html")
-    });
-    function collect(){
 
+    });
+     function collect(){
         onOpenPrompt();
         onStart();
+
+
     }
+
   </script>
 
 <div class="row">
@@ -53,7 +57,7 @@
       
       </div>
       <div style='display:flex;justify-content: center;'>
-            <button style="width: 50%; margin-bottom: 5px" onclick="collect()">
+            <button id="saved" style="width: 50%; margin-bottom: 5px" onclick="collect(),dropActionyay()">
         Collect</button>
       </div>
     
@@ -81,3 +85,5 @@
         </div>
     </div>
     </div>
+<!--<script type='text/javascript' src="../../javascript/getActions.js"></script>-->
+<script src="../../../frontend/javascript/dataReviewActionDrop.js"></script>

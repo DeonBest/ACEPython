@@ -1,5 +1,292 @@
+<!--
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
-  console.log(appdata);
+  $(function () {
+       /*
+            Add in components
+          */
+
+      $('#chartreview').load("../../components/patternRecognition/plotchart.html");
+
+
+<!--        fetch("http://127.0.0.1:5000/data")-->
+<!--          .then((response) => response.json())-->
+<!--          .then((result) => {-->
+<!--            console.log("This", result);-->
+<!--          });-->
+
+
+    });
+
+  console.log("This is " + appdata);// have the structure of what is selected for data collection tab and also all the data for specific channel and trials
+
+
+</script>
+        <script type="text/javascript">
+  /*
+    Handle toggling of the enabled channels
+*/
+  function channelToggle(channel) {
+    switch (channel) {
+      case "all":
+        if ($(`#channel-all`).attr("active") === "true") {
+          $("button[id^='channel-']").removeClass("btn btn-primary");
+          $("button[id^='channel-']").addClass("btn btn-secondary");
+          $("button[id^='channel-']").attr("active", "false");
+
+          if(channel == 1){
+            drawChartChannel1();
+            $("canvas[id=chartReview1]").addClass("hideCanvas");
+            $("canvas[id=chartReview1]").removeClass("showCanvas");
+          }
+          if(channel == 2){
+              drawChartChannel2();
+              $("canvas[id=chartReview2]").addClass("hideCanvas");
+              $("canvas[id=chartReview2]").removeClass("showCanvas");
+          }
+
+          /*
+          add more of
+          else if(channel == #){
+            drawChartChannel#();
+          }
+          */
+
+        } else {
+          $("button[id^='channel-']").removeClass("btn btn-secondary");
+          $("button[id^='channel-']").addClass("btn btn-primary");
+          $("button[id^='channel-']").attr("active", "true");
+
+          if(channel == 1){
+            drawChartChannel1();
+            $("canvas[id=chartReview1]").addClass("showCanvas");
+            $("canvas[id=chartReview1]").removeClass("hideCanvas");
+          }
+          if(channel == 2){
+            drawChartChannel2();
+            $("canvas[id=chartReview2]").addClass("showCanvas");
+            $("canvas[id=chartReview2]").removeClass("hideCanvas");
+          }
+
+          /*
+          add more of
+          else if(channel == #){
+            drawChartChannel#();
+          }
+          */
+        }
+        break;
+      default:
+        if ($(`#channel-${channel}`).attr("active") === "true") {
+          $(`#channel-${channel}`)
+            .toggleClass("btn btn-primary")
+            .toggleClass("btn btn-secondary")
+            .attr("active", "false");
+
+            if(channel == 1){
+            drawChartChannel1();
+            $("canvas[id=chartReview1]").addClass("hideCanvas");
+            $("canvas[id=chartReview1]").removeClass("showCanvas");
+          }
+           if(channel == 2){
+            drawChartChannel2();
+            $("canvas[id=chartReview2]").addClass("hideCanvas");
+            $("canvas[id=chartReview2]").removeClass("showCanvas");
+          }
+
+          /*
+          add more of
+          else if(channel == #){
+            drawChartChannel#();
+          }
+          */
+
+
+
+        } else {
+          $(`#channel-${channel}`)
+            .toggleClass("btn btn-primary")
+            .toggleClass("btn btn-secondary")
+            .attr("active", "true");
+
+            if(channel == 1){
+            drawChartChannel1();
+            $("canvas[id=chartReview1]").addClass("showCanvas");
+            $("canvas[id=chartReview1]").removeClass("hideCanvas");
+          }
+           if(channel == 2){
+            drawChartChannel2();
+            $("canvas[id=chartReview2]").addClass("showCanvas");
+            $("canvas[id=chartReview2]").removeClass("hideCanvas");
+          }
+
+          /*
+          add more of
+          else if(channel == #){
+            drawChartChannel#();
+          }
+          */
+        }
+        break;
+    }
+  }
+</script>
+<script>
+  var actionClass = document.querySelector('#configAction');
+  var $savedItems = localStorage.getItem('saved-list');
+  var savedActionList = $savedItems.split(',');
+<!--  var savedActionList = [];-->
+<!--  function addActionItems(){-->
+<!--    savedActionList.forEach(function (val, index) {-->
+<!--      actionClass.innerHTML = val;-->
+<!--      val = options;-->
+<!--      actionClass.appendChild(val);-->
+<!--      console.log("Test" + options);-->
+<!--    });-->
+
+<!--  }-->
+
+function addActionItems() {
+    savedActionList.forEach(function (val, index) {
+      var opt = document.createElement('option');
+      opt.innerHTML = val;
+      opt.value = val;
+      actionClass.appendChild(opt);
+    });
+  };
+console.log("Test1" + $savedItems);
+console.log("Test2" + localStorage);
+addActionItems();
+
 </script>
 
-<div class="row">Data Review</div>
+<div id='actionContainer'></div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-1">
+      <div id="actions">
+        <select class="action-control" id="configAction" name="config">
+          <option class="actionOptions" value="" name="">Select an action</option>
+        </select>
+      </div>
+    </div>
+      <div class="col-sm-2"></div>
+
+    <div class="col-sm-5">
+      <div class="form-group">
+        <label>Trial #</label>
+        <input type="text">
+      </div>
+      <button type="button" class="btn btn-secondary" onclick="displayThis()">Delete Trial</button>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+
+      <div id="chart"></div>
+      <div id='chartreview'></div>
+  </div>
+
+  <div class="row">
+    <div class="col-6" >
+
+      <div>
+        <h4>Channels</h4>
+      </div>
+      <div>
+
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="channel-1"
+  onclick="channelToggle(1)"
+  active="false"
+>
+  1
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="channel-2"
+  onclick="channelToggle(2)"
+  active="false"
+>
+  2
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="channel-3"
+  onclick="drawChart()"
+  active="false"
+>
+  3
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="channel-4"
+  onclick="drawChart()"
+  active="false"
+>
+  4
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="channel-5"
+  onclick="drawChart()"
+  active="false"
+>
+  5
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="channel-6"
+  onclick="drawChart()"
+  active="false"
+>
+  6
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="channel-7"
+  onclick="drawChart()"
+  active="false"
+>
+  7
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="channel-8"
+  onclick="drawChart()"
+  active="false"
+>
+  8
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="channel-all"
+  onclick="drawChart()"
+  active="false"
+>
+  All
+</button>
+
+      </div>
+
+    </div>
+
+  </div>
+<script src="../../../frontend/javascript/dataReviewActionDrop.js"></script>
+<!--<script src="../../../frontend/javascript/csvToArray.js"></script>-->

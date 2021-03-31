@@ -2,10 +2,12 @@ import sys
 from flask import Flask, jsonify, g, session
 import json
 import glob
+import csv
 import json
 import os
 import random
 import numpy as np
+from pathlib import Path
 app = Flask(__name__)
 @app.route("/")
 def hello():
@@ -58,6 +60,23 @@ def readcsv(filename, frame=0):
     return getData()
 
 
+# @app.route('/data')
+# def CSVToList():
+#     path = 'data\emg1KT60.csv'
+#     pathjs = 'frontend\javascript\csvToArray.js'
+#
+#     p = Path(__file__).parents[0]
+#     p2 = Path(__file__).parents[1]
+#     p2path = os.path.join(p2, pathjs)
+#     data = []
+#
+#     with open(os.path.join(p, path)) as f:
+#         reader = csv.reader(f)
+#         for row in reader:
+#             x = float(row[0])
+#             data.append(x)
+#     return data
+#
 
 if __name__ == "__main__":
     print(actions())

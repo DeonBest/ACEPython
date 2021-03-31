@@ -35,40 +35,40 @@
   />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
-
+  <script src="../../javascript/patternRecognition.js"></script>
   <script type="text/javascript">
-    var appdata={trials:[]};
-    var collectionConfig={
-      duration:5,
-      delay:5,
-      trials:1,
-      actions:[]
-    }
+<!--    var appdata={trials:[]};-->
+<!--    var collectionConfig={-->
+<!--      duration:5,-->
+<!--      delay:5,-->
+<!--      trials:1,-->
+<!--      actions:[]-->
+<!--    }-->
 
-    $(function () {
-      $('#patternRecContainer').load("./dataCollection.html")
-    });
+<!--    $(function () {-->
+<!--      $('#patternRecContainer').load("./dataCollection.html")-->
+<!--    });-->
 
-    function onTabChange(tab){
-      $( "a[class|='nav-link active']" ).toggleClass('active');
-      $(`#${tab}Tab`)
-            .toggleClass("active")
-    
-      $('#patternRecContainer').load(`./${tab}.html`);
-    }  
+<!--    function onTabChange(tab){-->
+<!--      $( "a[class|='nav-link active']" ).toggleClass('active');-->
+<!--      $(`#${tab}Tab`)-->
+<!--            .toggleClass("active")-->
+<!--    -->
+<!--      $('#patternRecContainer').load(`./${tab}.html`);-->
+<!--    }  -->
 
-    const onOpenPrompt = () => {
-    const remote = require("electron").remote;
-    const BrowserWindow = remote.BrowserWindow;
-    promptWindow = new BrowserWindow({
-      height: 600,
-      width: 800,
-    });
-console.log(__dirname)
-promptWindow.loadFile(__dirname + "/../actionPrompt.html");
-promptWindow.webContents.openDevTools();
-    
-  };
+<!--    const onOpenPrompt = () => {-->
+<!--    const remote = require("electron").remote;-->
+<!--    const BrowserWindow = remote.BrowserWindow;-->
+<!--    promptWindow = new BrowserWindow({-->
+<!--      height: 600,-->
+<!--      width: 800,-->
+<!--    });-->
+<!--console.log(__dirname)-->
+<!--promptWindow.loadFile(__dirname + "/../actionPrompt.html");-->
+<!--promptWindow.webContents.openDevTools();-->
+<!--    -->
+<!--  };-->
   </script>
 </head>
 
