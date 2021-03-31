@@ -2,10 +2,11 @@
 The main API Class
 
 Contains the endpoints accessible from localhost:5000
-Author: Evan Larkin 
+Author: Evan Larkin
 Date: Jan 2021
 """
 import sys
+import csv
 from flask import Flask, jsonify, g, session
 import json
 import glob
@@ -27,7 +28,7 @@ filereader = {}
 
 """
 This is called once before any other request is sent. It initializes the
-readers in the global variable at their respective key. 
+readers in the global variable at their respective key.
 
 DAQReader:{
     <readername>:{
@@ -40,33 +41,43 @@ FileReader:{
 }
 """
 
+
 @app.before_first_request
 def init():
     # Setup DAQ Readers
     DAQreader['micreader'] = {'reader': MicReader.MicReader(), 'name': "Mic"}
-    DAQreader['randomreader'] = {'reader': RandomReader.RandomReader(), 'name': 'Random'}
+    DAQreader['randomreader'] = {
+        'reader': RandomReader.RandomReader(), 'name': 'Random'}
     try:
-        DAQreader['delsysreader'] = {'reader': DelsysReader.DelsysReader(), 'name': 'Delsys'}
+        DAQreader['delsysreader'] = {
+            'reader': DelsysReader.DelsysReader(), 'name': 'Delsys'}
     except Exception as e:
         print("ERROR With Delsys")
-    
+
     # Setup File Reader
     filereader['reader'] = FileReader.FileReader()
 
     return jsonify(1)
 
+
 """
-This retrieves the path for the data files. When the application is built they are stored in temp 
+This retrieves the path for the data files. When the application is built they are stored in temp
 folder at path stored in env variable _MEIPASS. Otherwise they are found in /data/*
 """
+
+
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
-        print(base_path)
     except Exception:
+        # If in development, return the real path
         base_path = os.path.abspath(".")
+        # If engine.py is run before launching the app, base_path resolves to root (Debugging purposes)
+        # If engine.py is launched by the application, it resolves to backend (npm start)
+        if 'backend' not in base_path:
+            base_path = base_path + '/backend'
     return os.path.join(base_path, relative_path)
 
 
@@ -76,6 +87,15 @@ def resource_path(relative_path):
 This retrieves the list of readers available and instantiated.
 
 """
+
+
+@ app.route("/test")
+def test():
+    path1 = resource_path('data/*.csv')
+    path2 = os.path.dirname(os.path.realpath(__file__))
+    path3 = os.path.abspath(".")
+    return jsonify([path1, path2, path3])
+
 
 @ app.route("/getreaders")
 def getReaders():
@@ -206,7 +226,7 @@ def datafiles():
         my_list = []
         # Mac or Linux
         path = resource_path('data/*.csv')
-        if(platform.system()=='Windows'):
+        if(platform.system() == 'Windows'):
             path = resource_path('data\*.csv')
 
         for file in glob.glob(path):
@@ -227,20 +247,33 @@ Actions are in ../frontend/images/actions/
 @ app.route("/actions")
 def actions():
 
-    my_list = []
-    for file in glob.glob(os.path.dirname(os.path.realpath(__file__))+'/../frontend/images/actions/*.jpg'):
-        actionname = os.path.basename(file).replace(
+    actionlist = []
+    actionsFormatted = []
+    path = resource_path('actions/actions.csv')
+    if(platform.system() == 'Windows'):
+        path = resource_path('actions\\actions.csv')
+
+    with open(path, newline='') as f:
+        reader = csv.reader(f)
+        for file in reader:
+
+            actionlist.append(file[0])
+
+    for file in actionlist:
+
+        actionname = file.replace(
             "_", " ").replace(".jpg", "").capitalize()
-        actionkey = os.path.basename(file)
         action = {
-            'file_location': file,
             'action_name': actionname,
-            'action_key': actionkey
+            'action_key': file
         }
-        my_list.append(action)
-    return json.dumps(my_list)
+        actionsFormatted.append(action)
+    return json.dumps(actionsFormatted)
+
 
 def main():
     app.run(host='127.0.0.1', port=5000)
+
+
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5000)

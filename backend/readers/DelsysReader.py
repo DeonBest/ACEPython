@@ -109,17 +109,18 @@ class DelsysReader(Reader):
 
         # When no data left on buffer return
         except Exception as e:
+            print("Error", e)
             dataLength = int(len(result)/16)
             # 16xDatalength array of zeros
             val = np.zeros((16, dataLength))
             if(dataLength > 0):
                 # For each active sensor, get the data in the appropriate shape (every 16th value)
                 for i in range(0, len(self.activeSensors)):
+                    #limit to first 8 sensors
                     if(self.activeSensors[i] < 8):
-                        print(i, self.activeSensors[i])
                         val[self.activeSensors[i] -
                             1] = result[self.activeSensors[i]-1:len(result):16]
-                        # Array indexed from 0, sensor n = result[n-1]
+                        # Array indexed from 0, sensor n data = result[n-1]
                         print(result[self.activeSensors[i]-1:len(result):16])
             return val.tolist()
 
@@ -141,7 +142,7 @@ class DelsysReader(Reader):
 
             time.sleep(self.baseStationDelay)
 
-            # Disregard first message from base station, always Delsys Trigno System Digital Protocol Version x.y.z
+            # Disregard first message from base station, always 'Delsys Trigno System Digital Protocol Version x.y.z'
             data = self.commandSocket.recv(60)
             print('received "%s"' % data)
             print(len(data))
@@ -178,13 +179,14 @@ class DelsysReader(Reader):
     def start(self):
         if(self.commandSocket == None):
             print('No connection be sure to run connect() first')
+            return False
         start = "START\r\n\r\n"
         self.commandSocket.send(start.encode())
 
         time.sleep(self.baseStationDelay)
 
         data = self.commandSocket.recv(20)
-        print('Start data', data.decode('utf-8'), data)
+
         if 'OK' not in data.decode('utf-8'):
             return False
 
@@ -197,13 +199,14 @@ class DelsysReader(Reader):
     def stop(self):
         if(self.commandSocket == None):
             print('No connection be sure to run connect() first')
+            return False
+
         stop = "STOP\r\n\r\n"
         self.commandSocket.send(stop.encode())
 
         time.sleep(self.sensorDelay)
         try:
             data = self.commandSocket.recv(40).decode('utf-8')
-            print('Stop data', data)
 
             if 'OK' not in data:
                 print('Unable to stop data collection')
@@ -217,15 +220,13 @@ class DelsysReader(Reader):
 
     """
         Get information from Delsys base station.
-        Determine number of paired and active sensors
+        Determine number of paired and active sensors.
     """
 
     def getHardwareInfo(self):
-        print('test')
         self.pairedSensors = self.getSensorsPaired()
-        print(self.pairedSensors)
         self.activeSensors = self.getSensorsActive()
-        print(self.activeSensors)
+
 
     """
         Determine which sensors are paired
@@ -247,8 +248,7 @@ class DelsysReader(Reader):
                     result.append(i)
 
             except Exception as e:
-                print('error')
-                print(e)
+                print('error',e)
         if len(result) == 0:
             return 0
         else:
@@ -274,7 +274,7 @@ class DelsysReader(Reader):
                     result.append(sensorId)
 
             except Exception as e:
-                print(e)
+                print("error", e)
         if len(result) == 0:
             return 0
         else:

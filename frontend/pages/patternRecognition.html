@@ -74,6 +74,10 @@
       promptWindow = new BrowserWindow({
         height: 600,
         width: 800,
+        webPreferences: {
+          nodeIntegration: true,
+          enableRemoteModule: true,
+        },
       });
       console.log(__dirname)
       promptWindow.loadFile(__dirname + "/actionPrompt.html");
@@ -106,9 +110,11 @@
     <li class="nav-item">
       <a class="nav-link" id="dataReviewTab" onclick="onTabChange('dataReview')">Data Review</a>
     </li>
+    <!-- Enable when ready to implement Data Classification
     <li class="nav-item">
       <a class="nav-link"  id="dataClassificationTab"onclick="onTabChange('dataClassification')">Data Classification</a>
     </li>
+    -->
   </ul>
   <div class="tabContainer" id='dataCollectionTabContainer'>
    

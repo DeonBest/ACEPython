@@ -1,7 +1,7 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow } = require("electron");
 // import {PythonShell} from 'python-shell';
-const path = require('path')
+const path = require("path");
 const { PythonShell } = require("python-shell");
 
 PythonShell.runString("x=1+1;print(x)", null, function (err) {
@@ -26,7 +26,14 @@ if (env === "development") {
 process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "true";
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 1000, height: 800 });
+  mainWindow = new BrowserWindow({
+    width: 1000,
+    height: 800,
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true,
+    },
+  });
 
   /*
   PythonShell.run("backend/engine.py", null, function (err) {
@@ -75,60 +82,62 @@ app.on("activate", function () {
 // code. You can also put them in separate files and require them here.
 // add these to the end or middle of main.js
 
-let pyProc = null
-let pyPort = null
+let pyProc = null;
+let pyPort = null;
 
-function selectPort(){
-  pyPort = 5000
-  return pyPort
+function selectPort() {
+  pyPort = 5000;
+  return pyPort;
 }
 
-function createPyProc(){
-  let script = getScriptPath()
-  let port = '' + selectPort()
+function createPyProc() {
+  let script = getScriptPath();
+  let port = "" + selectPort();
 
   if (guessPackaged()) {
-    pyProc = require('child_process').execFile(script, [port])
+    pyProc = require("child_process").execFile(script, [port]);
   } else {
-    pyProc = require('child_process').spawn('python', [script, port])
+    //pyProc = require('child_process').spawn('python', [script, port])
+    PythonShell.run("backend/engine.py", null, function (err) {
+      if (err) throw err;
+    });
   }
 
   if (pyProc != null) {
     //console.log(pyProc)
-    console.log('child process success on port ' + port)
+    console.log("child process success on port " + port);
   }
 
-  createWindow()
+  createWindow();
 }
 
-function exitPyProc () {
-  pyProc.kill()
-  pyProc = null
-  pyPort = null
+function exitPyProc() {
+  pyProc.kill();
+  pyProc = null;
+  pyPort = null;
 }
 
-app.on('ready', createPyProc)
-app.on('will-quit', exitPyProc)
+app.on("ready", createPyProc);
+app.on("will-quit", exitPyProc);
 
-
-const PY_DIST_FOLDER = 'backend/pyenginedist'
-const PY_FOLDER = 'backend'
-const PY_MODULE = 'engine' // without .py suffix
+const PY_DIST_FOLDER = "backend/pyenginedist";
+const PY_FOLDER = "backend";
+const PY_MODULE = "engine"; // without .py suffix
 
 function guessPackaged() {
-  const fullPath = path.join(__dirname, PY_DIST_FOLDER)
-  return require('fs').existsSync(fullPath)
+  const fullPath = path.join(__dirname, PY_DIST_FOLDER);
+  return require("fs").existsSync(fullPath);
 }
 
-function getScriptPath(){
+function getScriptPath() {
   console.log("guessPackaged", guessPackaged());
   if (!guessPackaged()) {
-    console.log(path.join(__dirname, PY_FOLDER, PY_MODULE + '.py'))
-    return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
+    console.log(path.join(__dirname, PY_FOLDER, PY_MODULE + ".py"));
+    return path.join(__dirname, PY_FOLDER, PY_MODULE + ".py");
   }
-  if (process.platform === 'win32') {
-    return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE + '.exe')
+  if (process.platform === "win32") {
+    return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE + ".exe");
   }
-  console.log(path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE))
-  return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE)
+  console.log(path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE));
+  return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE);
 }

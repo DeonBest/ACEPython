@@ -1,10 +1,10 @@
+from datetime import datetime
+import numpy as np
 import requests
 import time
 string = 'testing %d val' % 10
-import numpy as np
-from datetime import datetime
-print(requests.get('http://127.0.0.1:5000/test').json())
-#print(requests.get('http://127.0.0.1:5000/datafiles').json())
+print(requests.get('http://127.0.0.1:5000/actions').json())
+# print(requests.get('http://127.0.0.1:5000/datafiles').json())
 
 
 """
