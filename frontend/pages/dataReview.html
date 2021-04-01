@@ -1,5 +1,136 @@
 <script type="text/javascript">
-  console.log(appdata);
+    var data_ch1;
+    var data_ch2;
+    var data_ch3;
+    var data_ch4;
+    var data_ch5;
+    var data_ch6;
+    var data_ch7;
+    var data_ch8;
+    var actionNow;
+
+    function myFunction(){
+      console.log(appdata.trials[0][0].reps[0][0]);
+      console.log(appdata.trials[0][0].name);
+    }
+
+    function drawChart(){
+      data_ch1=appdata.trials[0][0].reps[0][0];
+      data_ch2=appdata.trials[0][0].reps[0][1];
+      data_ch3=appdata.trials[0][0].reps[0][2];
+      data_ch4=appdata.trials[0][0].reps[0][3];
+      data_ch5=appdata.trials[0][0].reps[0][4];
+      data_ch6=appdata.trials[0][0].reps[0][5];
+      data_ch7=appdata.trials[0][0].reps[0][6];
+      data_ch8=appdata.trials[0][0].reps[0][7];
+
+        console.log(data_ch1);
+      var xaxis= Array.from({length: data_ch1.length}, (_, index) => index + 1);
+
+      var dataReviewCanvas = document.getElementById("dataReviewChart");
+
+      var dataFirst = {
+        label: "Channel 1",
+        data: data_ch1,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+      };
+      var dataGroups = {
+        labels: xaxis,
+        datasets: [dataFirst]
+      };
+
+      var chartOptions = {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            boxWidth: 80,
+            fontColor: 'black'
+          }
+        }
+      };
+      var lineChart = new Chart(dataReviewCanvas, {
+        type: 'line',
+        data: dataGroups,
+        options: chartOptions
+      });
+    }
+
+  var actionName=[];
+    function reviewClicked(){
+
+        if(collected){
+
+            callActionList();
+        }
+    }
+  function callActionList() {
+
+        for (var i = 0; i < appdata.trials[0].length; i++) {
+             actionName[i] = appdata.trials[0][i].name;
+        }
+        console.log("Test");
+        //console.log(actionName);
+        console.log(appdata.trials[0][1]);
+
+
+  var select = document.createElement("select");
+  select.name = "action-list";
+  select.id = "selectedItem";
+
+
+  for (const item of actionName) {
+    var option = document.createElement("option");
+    option.value = item;
+    option.text = item.charAt(0).toUpperCase() + item.slice(1);
+    option.id = actionName.indexOf(item);
+    select.appendChild(option);
+
+  }
+
+  document.getElementById("dropdown-container").appendChild(select);
+    actionSelect(selectedItem);
+
+}
+
+
+
+
+
+
+
+function selectRemover(){
+    document.querySelectorAll('[name=action-list]').forEach(function(a) {
+              a.remove()
+            });
+
+}
+
+function actionSelect(id){
+
+  var myselect = document.getElementById(id);
+  myselect.addEventListener("change", function () {
+   var index=myselect.selectedIndex ;
+   	console.log ("me" + index);
+  });
+}
+
+
 </script>
 
+
+
+
+<div class="row">
+  <h4>Data Review</h4>
+</div>
+
+<div id="dropdown-container">
+
+</div>
+
 <div class="row">Data Review</div>
+<button onclick="myFunction(),drawChart()">Button123</button>
+<canvas id="dataReviewChart" width="600" height="400"></canvas>

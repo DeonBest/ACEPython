@@ -56,7 +56,6 @@
       $( "a[class|='nav-link active']" ).toggleClass('active');
       $(`#${tab}Tab`)
             .toggleClass("active")
-    
 
       var ele = document.getElementsByClassName('tabContainer');
       for (var i = 0; i < ele.length; i++ ) {
@@ -101,10 +100,10 @@
   <div id="navigation"></div>
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a class="nav-link active" id="dataCollectionTab" onclick="onTabChange('dataCollection')" tab="patternRecTab">Data Collection</a>
+      <a class="nav-link active" id="dataCollectionTab" onclick="onTabChange('dataCollection'), selectRemover()" tab="patternRecTab">Data Collection</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="dataReviewTab" onclick="onTabChange('dataReview')">Data Review</a>
+      <a class="nav-link" id="dataReviewTab" onclick="onTabChange('dataReview'),reviewClicked()">Data Review</a>
     </li>
     <li class="nav-item">
       <a class="nav-link"  id="dataClassificationTab"onclick="onTabChange('dataClassification')">Data Classification</a>
