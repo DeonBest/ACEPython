@@ -1,5 +1,494 @@
 <script type="text/javascript">
-  console.log(appdata);
+    var data_ch1;
+    var data_ch2;
+    var data_ch3;
+    var data_ch4;
+    var data_ch5;
+    var data_ch6;
+    var data_ch7;
+    var data_ch8;
+    var actionNow = 0;
+    var firstTime = true;
+    var firstTime1 = true;
+    var firstTime2 = true;
+    var firstTime3 = true;
+    var firstTime4 = true;
+    var firstTime5 = true;
+    var firstTime6 = true;
+    var firstTime7 = true;
+    var firstTime8 = true;
+    var dataSetTotal = [];
+    var lineChart;
+    var orderCounter=0;
+
+    var tempData1 = {
+        data: [0],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+    };
+    var tempData2 = {
+        data: [0],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+    };
+    var tempData3 = {
+        data: [0],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+    };
+    var tempData4 = {
+        data: [0],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+    };
+    var tempData5 = {
+        data: [0],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+    };
+    var tempData6 = {
+        data: [0],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+    };
+    var tempData7 = {
+        data: [0],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+    };
+    var tempData8 = {
+        data: [0],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+    };
+    var tempTotal = [tempData1,tempData2,tempData3,tempData4,tempData5,tempData6,tempData7,tempData8]
+
+    function myFunction(){
+      console.log(appdata.trials[0][0].reps[0][0]);
+      console.log(appdata.trials[0][0].name);
+    }
+
+  function drawChart(actionNow, chNum){
+      data_ch1=appdata.trials[0][actionNow].reps[0][0];
+      data_ch2=appdata.trials[0][actionNow].reps[0][1];
+      data_ch3=appdata.trials[0][actionNow].reps[0][2];
+      data_ch4=appdata.trials[0][actionNow].reps[0][3];
+      data_ch5=appdata.trials[0][actionNow].reps[0][4];
+      data_ch6=appdata.trials[0][actionNow].reps[0][5];
+      data_ch7=appdata.trials[0][actionNow].reps[0][6];
+      data_ch8=appdata.trials[0][actionNow].reps[0][7];
+
+      if(firstTime){
+            for (var i = 0; i < data_ch1.length; i++){
+              data_ch2[i] += 2;
+              data_ch3[i] += 4;
+              data_ch4[i] += 6;
+              data_ch5[i] += 8;
+              data_ch6[i] += 10;
+              data_ch7[i] += 12;
+              data_ch8[i] += 14;
+            }
+            firstTime = false;
+      }
+      console.log(data_ch1);
+      var xaxis= Array.from({length: data_ch1.length}, (_, index) => index + 1);
+      var dataReviewCanvas = document.getElementById("dataReviewChart");
+
+      var dataFirst = {
+        label: "Channel 1",
+        data: data_ch1,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+      };
+
+      var dataSecond = {
+        label: "Channel 2",
+        data: data_ch2,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'orange'
+      };
+
+      var dataThird = {
+        label: "Channel 3",
+        data: data_ch3,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'yellow'
+      };
+
+      var dataFourth = {
+        label: "Channel 4",
+        data: data_ch4,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'green'
+      };
+
+      var dataFifth = {
+        label: "Channel 5",
+        data: data_ch5,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'blue'
+      };
+
+      var dataSixth = {
+        label: "Channel 6",
+        data: data_ch6,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'purple'
+      };
+
+      var dataSeventh = {
+        label: "Channel 7",
+        data: data_ch7,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'pink'
+      };
+
+      var dataEighth = {
+        label: "Channel 8",
+        data: data_ch8,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'black'
+      };
+
+      dataSetTotal[0] = dataFirst;
+      dataSetTotal[1] = dataSecond;
+      dataSetTotal[2] = dataThird;
+      dataSetTotal[3] = dataFourth;
+      dataSetTotal[4] = dataFifth;
+      dataSetTotal[5] = dataSixth;
+      dataSetTotal[6] = dataSeventh;
+      dataSetTotal[7] = dataEighth;
+
+      var delayBool = true;
+
+      while(delayBool){
+        if(dataSetTotal[7].empty){
+            sleep(1000);
+        }
+        else{
+            delayBool=false;
+            console.log(dataSetTotal);
+        }
+      }
+
+      var dataGroups = {
+        labels: xaxis,
+        datasets: [dataFirst,tempData1,tempData2,tempData3,tempData4,tempData5,tempData6,tempData7]
+      };
+      //console.log(datasets);
+
+      var chartOptions = {
+        legend: {
+          display: false,
+          position: 'top',
+          labels: {
+            boxWidth: 80,
+            fontColor: 'black'
+          }
+        }
+      };
+
+      lineChart = new Chart(dataReviewCanvas, {
+        type: 'line',
+        data: dataGroups,
+        options: chartOptions
+      });
+
+  }
+
+  var actionName=[];
+    function reviewClicked(){
+        if(collected){
+            callActionList();
+        }
+    }
+
+    function callActionList() {
+        for (var i = 0; i < appdata.trials[0].length; i++) {
+             actionName[i] = appdata.trials[0][i].name;
+        }
+        console.log("Test");
+        console.log(appdata.trials[0][1]);
+
+    var select = document.createElement("select");
+    select.name = "action-list";
+    select.id = "selectedItem";
+
+    for (const item of actionName) {
+    var option = document.createElement("option");
+    option.value = item;
+    option.text = item.charAt(0).toUpperCase() + item.slice(1);
+    option.id = actionName.indexOf(item);
+    select.appendChild(option);
+    }
+    document.getElementById("dropdown-container").appendChild(select);
+    actionSelect("selectedItem");
+    }
+
+    function selectRemover(){
+        document.querySelectorAll('[name=action-list]').forEach(function(a) {
+                  a.remove()
+                });
+    }
+
+    function actionSelect(id){
+
+      var myselect = document.getElementById(id);
+      myselect.addEventListener("change", function () {
+       var index=myselect.selectedIndex ;
+        console.log ("me" + index);
+        actionNow = index;
+        console.log(actionNow);
+        //call function here to draw graph. index can be used to select the action that we are taking.
+        lineChart.destroy();
+        actionChangeToggleReset();
+        drawChart(actionNow, 0);
+      });
+    }
+
+
+    function addData(dataSetIndex) {
+      lineChart.data.datasets[dataSetIndex] = dataSetTotal[dataSetIndex];
+      lineChart.update();
+    }
+
+
+    function removeData(dataSetIndex) {
+      lineChart.data.datasets[dataSetIndex] = tempTotal[dataSetIndex];
+      lineChart.update();
+    }
+
+    function actionChangeToggleReset(){
+        firstTime = true;
+        firstTime1 = true;
+        firstTime2 = true;
+        firstTime3 = true;
+        firstTime4 = true;
+        firstTime5 = true;
+        firstTime6 = true;
+        firstTime7 = true;
+        firstTime8 = true;
+    }
+
+    function toggleData(channelIndexClick) {
+         if(channelIndexClick==0){
+            if(!firstTime1){
+              addData(channelIndexClick);
+              firstTime1 = true;
+            }
+            else{
+              removeData(channelIndexClick);
+              firstTime1 = false;
+            }
+
+        }
+
+        else if(channelIndexClick==1){
+            if(firstTime2){
+              addData(channelIndexClick);
+              firstTime2 = false
+            }
+            else{
+              removeData(channelIndexClick);
+              firstTime2 = true;
+            }
+        }
+
+        else if(channelIndexClick==2){
+            if(firstTime3){
+              addData(channelIndexClick);
+              firstTime3 = false
+            }
+            else{
+              removeData(channelIndexClick);
+              firstTime3 = true;
+            }
+        }
+
+       else if(channelIndexClick==3){
+            if(firstTime4){
+              addData(channelIndexClick);
+              firstTime4 = false
+            }
+            else{
+              removeData(channelIndexClick);
+              firstTime4 = true;
+            }
+       }
+
+       else if(channelIndexClick==4){
+            if(firstTime5){
+              addData(channelIndexClick);
+              firstTime5 = false
+            }
+            else{
+              removeData(channelIndexClick);
+              firstTime5 = true;
+            }
+       }
+
+       else if(channelIndexClick==5){
+            if(firstTime6){
+              addData(channelIndexClick);
+              firstTime6 = false
+            }
+            else{
+              removeData(channelIndexClick);
+              firstTime6 = true;
+            }
+       }
+
+       else if(channelIndexClick==6){
+            if(firstTime7){
+              addData(channelIndexClick);
+              firstTime7 = false
+            }
+            else{
+              removeData(channelIndexClick);
+              firstTime7 = true;
+            }
+       }
+
+       else if(channelIndexClick==7){
+            if(firstTime8){
+              addData(channelIndexClick);
+              firstTime8 = false
+            }
+            else{
+              removeData(channelIndexClick);
+              firstTime8 = true;
+            }
+       }
+
+
+    }
+
+
+
+
+
 </script>
 
-<div class="row">Data Review</div>
+
+<div class="row">
+    <h4>Data Review</h4>
+</div>
+
+<div id="dropdown-container">
+
+</div>
+
+<canvas height="400" id="dataReviewChart" width="600"></canvas>
+
+<div class="row">
+    <div class="col-6">
+
+        <div>
+            <h4>Channels</h4>
+        </div>
+        <div>
+
+            <button
+                    active="false"
+                    class="btn btn-secondary"
+                    id="channel-1"
+                    onclick="toggleData(0)"
+                    type="button"
+            >
+                1
+            </button>
+            <button
+                    active="false"
+                    class="btn btn-secondary"
+                    id="channel-2"
+                    onclick="toggleData(1)"
+                    type="button"
+            >
+                2
+            </button>
+            <button
+                    active="false"
+                    class="btn btn-secondary"
+                    id="channel-3"
+                    onclick="toggleData(2)"
+                    type="button"
+            >
+                3
+            </button>
+            <button
+                    active="false"
+                    class="btn btn-secondary"
+                    id="channel-4"
+                    onclick="toggleData(3)"
+                    type="button"
+            >
+                4
+            </button>
+            <button
+                    active="false"
+                    class="btn btn-secondary"
+                    id="channel-5"
+                    onclick="toggleData(4)"
+                    type="button"
+            >
+                5
+            </button>
+            <button
+                    active="false"
+                    class="btn btn-secondary"
+                    id="channel-6"
+                    onclick="toggleData(5)"
+                    type="button"
+            >
+                6
+            </button>
+            <button
+                    active="false"
+                    class="btn btn-secondary"
+                    id="channel-7"
+                    onclick="toggleData(6)"
+                    type="button"
+            >
+                7
+            </button>
+            <button
+                    active="false"
+                    class="btn btn-secondary"
+                    id="channel-8"
+                    onclick="toggleData(7)"
+                    type="button"
+            >
+                8
+            </button>
+            <button
+                    active="false"
+                    class="btn btn-secondary"
+                    id="channel-all"
+                    onclick="toggleData(0), toggleData(1), toggleData(2), toggleData(3), toggleData(4), toggleData(5), toggleData(6), toggleData(7)"
+                    type="button"
+            >
+                All
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+

@@ -12,9 +12,12 @@
       $('#promptView').load("../components/patternRecognition/promptView.html")
       $("#toast").load("../components/common/toast.html");
     });
+    var collected = false;
     function collect(){
         onOpenPrompt();
         onStart(true);
+        collected = true;
+
     }
     function preview(){
       onOpenPrompt();
@@ -23,6 +26,7 @@
   </script>
   
 <div>
+
 <div class="row">
     <div class="col" id="chart">
       <div id="chart"></div>
