@@ -7,7 +7,26 @@
     var data_ch6;
     var data_ch7;
     var data_ch8;
-    var actionNow;
+    var actionNow = 0;
+    var firstTime = true;
+    var firstTime1 = true;
+    var firstTime2 = true;
+    var firstTime3 = true;
+    var firstTime4 = true;
+    var firstTime5 = true;
+    var firstTime6 = true;
+    var firstTime7 = true;
+    var firstTime8 = true;
+    var dataSet1;
+    var dataSet2;
+    var dataSet3;
+    var dataSet4;
+    var dataSet5;
+    var dataSet6;
+    var dataSet7;
+    var dataSet8;
+    var dataSetTotal = [];
+    var lineChart;
 
     function myFunction(){
       console.log(appdata.trials[0][0].reps[0][0]);
@@ -30,7 +49,7 @@
       var dataReviewCanvas = document.getElementById("dataReviewChart");
 
       var dataFirst = {
-        label: "Channel 1",
+<!--        label: "Channel 1",-->
         data: data_ch1,
         lineTension: 0,
         fill: false,
@@ -49,9 +68,232 @@
             boxWidth: 80,
             fontColor: 'black'
           }
+
+
+
+
         }
       };
       var lineChart = new Chart(dataReviewCanvas, {
+        type: 'line',
+        data: dataGroups,
+        options: chartOptions
+      });
+    }
+
+
+
+  function drawChart(actionNow, chNum){
+      data_ch1=appdata.trials[0][actionNow].reps[0][0];
+      data_ch2=appdata.trials[0][actionNow].reps[0][1];
+      data_ch3=appdata.trials[0][actionNow].reps[0][2];
+      data_ch4=appdata.trials[0][actionNow].reps[0][3];
+      data_ch5=appdata.trials[0][actionNow].reps[0][4];
+      data_ch6=appdata.trials[0][actionNow].reps[0][5];
+      data_ch7=appdata.trials[0][actionNow].reps[0][6];
+      data_ch8=appdata.trials[0][actionNow].reps[0][7];
+
+      if(firstTime){
+            for (var i = 0; i < data_ch1.length; i++){
+              data_ch2[i] += 2;
+              data_ch3[i] += 4;
+              data_ch4[i] += 6;
+              data_ch5[i] += 8;
+              data_ch6[i] += 10;
+              data_ch7[i] += 12;
+              data_ch8[i] += 14;
+            }
+            firstTime = false;
+      }
+
+        console.log(data_ch1);
+      var xaxis= Array.from({length: data_ch1.length}, (_, index) => index + 1);
+
+<!--      switch(chNum){-->
+
+<!--        case 0:-->
+<!--          if(firstTime1){-->
+<!--            for (var i = 0; i < data_ch1.length; i++){-->
+<!--              data_ch1[i] += chNum;-->
+<!--            }-->
+<!--            firstTime1=false;-->
+<!--          }-->
+<!--          break;-->
+
+<!--        case 1:-->
+<!--          if(firstTime2){-->
+<!--            for (var i = 0; i < data_ch1.length; i++){-->
+<!--              data_ch1[i] += chNum;-->
+<!--            }-->
+<!--            firstTime2=false;-->
+<!--          }-->
+<!--          break;-->
+
+<!--        case 2:-->
+<!--          if(firstTime3){-->
+<!--            for (var i = 0; i < data_ch1.length; i++){-->
+<!--              data_ch1[i] += chNum;-->
+<!--            }-->
+<!--            firstTime3=false;-->
+<!--          }-->
+<!--          break;-->
+
+<!--        case 3:-->
+<!--          if(firstTime4){-->
+<!--            for (var i = 0; i < data_ch1.length; i++){-->
+<!--              data_ch1[i] += chNum;-->
+<!--            }-->
+<!--            firstTime4=false;-->
+<!--          }-->
+<!--          break;-->
+
+<!--        case 4:-->
+<!--          if(firstTime5){-->
+<!--            for (var i = 0; i < data_ch1.length; i++){-->
+<!--              data_ch1[i] += chNum;-->
+<!--            }-->
+<!--            firstTime5=false;-->
+<!--          }-->
+<!--          break;-->
+
+<!--        case 5:-->
+<!--          if(firstTime6){-->
+<!--            for (var i = 0; i < data_ch1.length; i++){-->
+<!--              data_ch1[i] += chNum;-->
+<!--            }-->
+<!--            firstTime6=false;-->
+<!--          }-->
+<!--          break;-->
+
+<!--        case 6:-->
+<!--          if(firstTime7){-->
+<!--            for (var i = 0; i < data_ch1.length; i++){-->
+<!--              data_ch1[i] += chNum;-->
+<!--            }-->
+<!--            firstTime7=false;-->
+<!--          }-->
+<!--          break;-->
+
+<!--        case 7:-->
+<!--          if(firstTime8){-->
+<!--            for (var i = 0; i < data_ch1.length; i++){-->
+<!--              data_ch1[i] += chNum;-->
+<!--            }-->
+<!--            firstTime8=false;-->
+<!--          }-->
+<!--          break;-->
+
+
+
+<!--      }-->
+
+
+
+
+      var dataReviewCanvas = document.getElementById("dataReviewChart");
+
+      var dataFirst = {
+        label: "Channel 1",
+        data: data_ch1,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'red'
+      };
+
+      var dataSecond = {
+        label: "Channel 2",
+        data: data_ch2,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'orange'
+      };
+
+      var dataThird = {
+        label: "Channel 3",
+        data: data_ch3,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'yellow'
+      };
+
+      var dataFourth = {
+        label: "Channel 4",
+        data: data_ch4,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'green'
+      };
+
+      var dataFifth = {
+        label: "Channel 5",
+        data: data_ch5,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'blue'
+      };
+
+      var dataSixth = {
+        label: "Channel 6",
+        data: data_ch6,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'purple'
+      };
+
+      var dataSeventh = {
+        label: "Channel 7",
+        data: data_ch7,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'pink'
+      };
+
+      var dataEighth = {
+        label: "Channel 8",
+        data: data_ch8,
+        lineTension: 0,
+        fill: false,
+        borderColor: 'black'
+      };
+      dataSet1 = dataFirst;
+      dataSet2 = dataSecond;
+      dataSet3 = dataThird;
+      dataSet4 = dataFourth;
+      dataSet5 = dataFifth;
+      dataSet6 = dataSixth;
+      dataSet7 = dataSeventh;
+      dataSet8 = dataEighth;
+
+
+      dataSetTotal[0] = dataFirst;
+      dataSetTotal[1] = dataSecond;
+      dataSetTotal[2] = dataThird;
+      dataSetTotal[3] = dataFourth;
+      dataSetTotal[4] = dataFifth;
+      dataSetTotal[5] = dataSixth;
+      dataSetTotal[6] = dataSeventh;
+      dataSetTotal[7] = dataEighth;
+
+
+      var dataGroups = {
+        labels: xaxis,
+
+        datasets: [dataFirst]
+<!--        datasets: [dataFirst, dataSecond, dataThird, dataFourth, dataFifth, dataSixth, dataSeventh, dataEighth]-->
+<!--      -->
+      };
+
+      var chartOptions = {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            boxWidth: 80,
+            fontColor: 'black'
+          }
+        }
+      };
+      lineChart = new Chart(dataReviewCanvas, {
         type: 'line',
         data: dataGroups,
         options: chartOptions
@@ -91,7 +333,7 @@
   }
 
   document.getElementById("dropdown-container").appendChild(select);
-    actionSelect(selectedItem);
+    actionSelect("selectedItem");
 
 }
 
@@ -114,7 +356,134 @@ function actionSelect(id){
   myselect.addEventListener("change", function () {
    var index=myselect.selectedIndex ;
    	console.log ("me" + index);
+   	actionNow = index;
+   	console.log(actionNow);
+   	//call function here to draw graph. index can be used to select the action that we are taking.
+   	lineChart.destroy();
+   	firstTime=true;
+    drawChart(actionNow, 0);
   });
+}
+
+
+function addData(dataSetIndex) {
+<!--  lineChart.data.labels[dataSetIndex] = "Channel" + dataSetIndex;-->
+  lineChart.data.datasets[dataSetIndex] = dataSetTotal[dataSetIndex];
+  lineChart.update();
+}
+
+
+function removeData(dataSetIndex) {
+<!--  lineChart.data.labels.splice(dataSetIndex, 1);-->
+  lineChart.data.datasets.splice(dataSetIndex, 1);
+  lineChart.update();
+}
+
+
+
+function toggleData(channelIndexClick) {
+
+
+     if(channelIndexClick==0){
+        if(!firstTime1){
+          addData(channelIndexClick);
+          firstTime1 = true
+        }
+        else{
+          removeData(channelIndexClick);
+          firstTime1 = false;
+        }
+
+    }
+
+    else if(channelIndexClick==1){
+
+        if(firstTime2){
+          addData(channelIndexClick);
+          firstTime2 = false
+        }
+        else{
+          removeData(channelIndexClick);
+          firstTime2 = true;
+        }
+
+    }
+
+    else if(channelIndexClick==2){
+
+        if(firstTime3){
+          addData(channelIndexClick);
+          firstTime3 = false
+        }
+        else{
+          removeData(channelIndexClick);
+          firstTime3 = true;
+        }
+
+    }
+
+   else if(channelIndexClick==3){
+        if(firstTime4){
+          addData(channelIndexClick);
+          firstTime4 = false
+        }
+        else{
+          removeData(channelIndexClick);
+          firstTime4 = true;
+        }
+
+   }
+
+   else if(channelIndexClick==4){
+
+        if(firstTime5){
+          addData(channelIndexClick);
+          firstTime5 = false
+        }
+        else{
+          removeData(channelIndexClick);
+          firstTime5 = true;
+        }
+
+   }
+
+   else if(channelIndexClick==5){
+        if(firstTime6){
+          addData(channelIndexClick);
+          firstTime6 = false
+        }
+        else{
+          removeData(channelIndexClick);
+          firstTime6 = true;
+        }
+
+   }
+
+   else if(channelIndexClick==6){
+        if(firstTime7){
+          addData(channelIndexClick);
+          firstTime7 = false
+        }
+        else{
+          removeData(channelIndexClick);
+          firstTime7 = true;
+        }
+
+   }
+
+   else if(channelIndexClick==7){
+        if(firstTime8){
+          addData(channelIndexClick);
+          firstTime8 = false
+        }
+        else{
+          removeData(channelIndexClick);
+          firstTime8 = true;
+        }
+
+   }
+
+
 }
 
 
@@ -131,6 +500,104 @@ function actionSelect(id){
 
 </div>
 
-<div class="row">Data Review</div>
-<button onclick="myFunction(),drawChart()">Button123</button>
+<!--<div class="row">Data Review</div>-->
+<!--<button onclick="removeData(0)">Button123</button>-->
+<!--<button onclick="addData(0)">Button321</button>-->
 <canvas id="dataReviewChart" width="600" height="400"></canvas>
+
+  <div class="row">
+    <div class="col-6" >
+
+      <div>
+        <h4>Channels</h4>
+      </div>
+      <div>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="channel-1"
+          onclick="toggleData(0)"
+          active="false"
+        >
+          1
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="channel-2"
+          onclick="toggleData(1)"
+          active="false"
+        >
+          2
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="channel-3"
+          onclick="toggleData(2)"
+          active="false"
+        >
+          3
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="channel-4"
+          onclick="toggleData(3)"
+          active="false"
+        >
+          4
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="channel-5"
+          onclick="toggleData(4)"
+          active="false"
+        >
+          5
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="channel-6"
+          onclick="toggleData(5)"
+          active="false"
+        >
+          6
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="channel-7"
+          onclick="toggleData(6)"
+          active="false"
+        >
+          7
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="channel-8"
+          onclick="toggleData(7)"
+          active="false"
+        >
+          8
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="channel-all"
+          onclick="toggleData(0), toggleData(1), toggleData(2), toggleData(3), toggleData(4), toggleData(5), toggleData(6), toggleData(7)"
+          active="false"
+        >
+          All
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
