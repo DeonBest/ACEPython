@@ -78,7 +78,7 @@
           enableRemoteModule: true,
         },
       });
-      console.log(__dirname)
+
       promptWindow.loadFile(__dirname + "/actionPrompt.html");
       promptWindow.webContents.openDevTools();
     }
@@ -87,7 +87,7 @@
       promptWindow.webContents.openDevTools();
     }
     promptWindow.on('close', function() { //   <---- Catch close event
-      console.log("promptWindow Close");
+
       promptWindow=undefined;
     });
 

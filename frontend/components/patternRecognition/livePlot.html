@@ -319,7 +319,6 @@
                     }
                     channelsActive.map((channelActive, channelInd) => {
                       if (channelActive) {
-                        //console.log(data[channelInd].length,channelInd)
                         if (chartdata[channelInd].length > PLOT_POINTS) {
                           chartdata[channelInd].shift();
                         }
@@ -353,6 +352,7 @@
             })
             .catch(() => {
               showToast("Read Error");
+              ticker.stop();
             });
         }
       }
@@ -445,7 +445,7 @@
             setTimeout(checkFlag, FRAME_SIZE);
           } else {
             // DONE
-            console.log(appdata);
+
             // Reset indexes if data not recorded
             if (!collect) {
               (currentTrial = 0),
@@ -455,7 +455,6 @@
                 (frame = 0);
             }
             if (promptWindow) {
-              console.log(promptWindow);
               promptWindow.webContents.send("message", {
                 text: "Done",
                 progress: {

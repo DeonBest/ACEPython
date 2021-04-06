@@ -139,7 +139,7 @@
 
     // Determine the reader selected
     let reader = $("#daq-select").val();
-    console.log($("#input-type-daq").is(":checked"));
+
     if ($("#input-type-daq").is(":checked")) reader = $("#daq-select").val();
     if ($("#input-type-file").is(":checked")) reader = "file";
 
@@ -214,10 +214,10 @@
           });
 
           // If recording, save the data
-          if(collect){
+          if (collect) {
             for (var j = 0; j <= 7; j++) {
-                appdata[j] = appdata[j].concat(result[j]);
-              }
+              appdata[j] = appdata[j].concat(result[j]);
+            }
           }
 
           // Time to log the selected feature
@@ -252,8 +252,6 @@
             }
           } catch (e) {
             console.log(e);
-            console.log(result);
-            console.log(data);
           }
 
           myLineChart1.data.datasets[0].data = data[0];
@@ -270,7 +268,6 @@
           frame++;
         })
         .catch((e) => {
-          console.log("ERRO", e);
           showToast("Read Error");
           ticker.stop();
         });

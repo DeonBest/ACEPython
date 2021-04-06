@@ -108,7 +108,7 @@
         }
         firstTime = false;
       }
-      console.log(data_ch1);
+
       var xaxis = Array.from(
         { length: data_ch1.length },
         (_, index) => index + 1
@@ -272,7 +272,7 @@
     for (var i = 0; i < appdata.trials[0].length; i++) {
       actionName[i] = appdata.trials[0][i].name;
     }
-    console.log("Test");
+
     console.log(appdata.trials[0][1]);
 
     var select = document.createElement("select");
@@ -300,9 +300,9 @@
     var myselect = document.getElementById(id);
     myselect.addEventListener("change", function () {
       var index = myselect.selectedIndex;
-      console.log("me" + index);
+
       actionNow = index;
-      console.log(actionNow);
+
       //call function here to draw graph. index can be used to select the action that we are taking.
       lineChart.destroy();
       actionChangeToggleReset();

@@ -50,7 +50,7 @@ $(function () {
     function onFileChange() {
     // Set file to inital selection state
     const file = $('#file-select :selected').text().split(".")[0];
-    console.log("FILE oc", file)
+
     fetch(`http://127.0.0.1:5000/setfileinput/${file}`)
   }
 
@@ -61,7 +61,7 @@ function onFileSelect() {
     $("#input-type-daq").attr("checked", false);
     // Set file to inital selection state
     const file = $('#file-select :selected').text().split(".")[0];
-    console.log("FILE fs", file)
+
     fetch(`http://127.0.0.1:5000/setfileinput/${file}`)
   }
 

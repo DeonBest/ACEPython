@@ -4,11 +4,6 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const { PythonShell } = require("python-shell");
 
-PythonShell.runString("x=1+1;print(x)", null, function (err) {
-  if (err) throw err;
-  console.log("finished");
-});
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -104,7 +99,6 @@ function createPyProc() {
   }
 
   if (pyProc != null) {
-    //console.log(pyProc)
     console.log("child process success on port " + port);
   }
 
@@ -130,14 +124,11 @@ function guessPackaged() {
 }
 
 function getScriptPath() {
-  console.log("guessPackaged", guessPackaged());
   if (!guessPackaged()) {
-    console.log(path.join(__dirname, PY_FOLDER, PY_MODULE + ".py"));
     return path.join(__dirname, PY_FOLDER, PY_MODULE + ".py");
   }
   if (process.platform === "win32") {
     return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE + ".exe");
   }
-  console.log(path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE));
   return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE);
 }
