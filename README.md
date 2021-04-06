@@ -16,12 +16,11 @@ A basic Electron application needs just these files:
 
 You can learn more about each of these components within the [Quick Start Guide](https://electronjs.org/docs/tutorial/quick-start).
 
-
 ## Requirements
 
-To run this application for development you will need the following installations
+To run this application for development you will need the following installations.
 
-To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. [Python 3.7](https://www.python.org/downloads/) and Pip3 are required for the python backend. 
+To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. [Python 3.7](https://www.python.org/downloads/) and Pip3 are required for the python backend.
 Versions Used For Development:
 NodeJs: v14.13.0
 npm: v6.14.9
@@ -82,6 +81,8 @@ The flask application which defines the endpoints is in backend/engine.py. These
 
 ```
 backend
+└───actions
+│		|- .csv file serving as the list of actions
 └───data
 │		|- .csv data files of emg data that can be used as input
 └───readers
@@ -94,23 +95,25 @@ backend
 
 ## Readers
 
-Readers are the classes that are used to interface with different hardware or input sources. They all implement the abstract class, Reader.py. Adding a new reader can be done by creating a new reader class, and adding the reader to the struct at the top of the engine.py file at a given key. The readers are then requested by the frontend and contain their key and a name which is used for the dropdown field selection. When collection is triggered, the reading will be done from the reader specified with the key. There are two types of readers, the file reader and the data acquisition readers (DAQ). An init() function is called before the first call to the API, and the readers are initialized.
+Readers are the classes that are used to interface with different hardware or input sources. They all implement the abstract class, Reader.py. Adding a new reader can be done by creating a new reader class, and adding the reader to the dict at the top of the engine.py file at a given key. The readers are then requested by the frontend and contain their key and a name which is used for the dropdown field selection. When collection is triggered, the reading will be done from the reader specified with the key. There are two types of readers, the file reader and the data acquisition readers (DAQ). An init() function is called before the first call to the API, and the readers are initialized. The frontend will then trigger start() collect() and stop() to retreive data from the specified device.
 
 ## Features
 
-Features are defined in the frontend/javascript directory. The objects contain a name, for use in the dropdown, and a calculate function, used to compute the feature on an array of values.
+Features are defined in the frontend/javascript directory. The objects contain a name for use in the dropdown, and a calculate function, used to compute the feature on an array of values.
 
 ## Data Files
 
-Data files that can be used as input can be stored in backend/data. They must be in a .csv format. They frontend requests the list of files, and allows selection of a file to use if desired.
+Data files that can be used as input can be stored in backend/data. They must be in a .csv format. The frontend requests the list of files, and allows selection of a file to use if desired.
 
 ## Actions
 
-The list of actions is determined from the images in the frontend/images/actions directory. To add an action, simply add an image to the directory. The name that will be displayed will pulled from the file name, so keep naming consistent.
+The list of actions is determined from the actions csv file in /backend/actions. The entries need corresponding images in the frontend/images/actions directory. To add an action, simply add an image to the directory and add its file name to the csv. The name that will be displayed in the dropdown will pulled from the file name, so keep naming consistent.
 
 ## Building
+
 To build a standalone Desktop app for this project.
 Note: The backend must be built before the frontend. Building the electron app must have a built version of the backend to use for the standalone application.
+
 ```bash
 # Build the backend
  #Windows
@@ -118,7 +121,8 @@ Note: The backend must be built before the frontend. Building the electron app m
  #Mac
   npm run build-backend-mac
 # Build the frontend
-npm run build-frontend
+  npm run build-frontend
 ```
+
 The backend is built by [pyinstaller](https://www.pyinstaller.org/) and stored in backend/pyenginedist
 The frontend is built by [electron-packager](https://github.com/electron/electron-packager) and stored in the root directory at ace-darwin-x64 (mac) and ace-win32-x64(windows). The respective executable is found inside.
