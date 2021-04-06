@@ -107,6 +107,7 @@ function createPyProc() {
 }
 
 function exitPyProc() {
+  fetch(`http://127.0.0.1:5000/terminate`)
   pyProc.kill();
   pyProc = null;
   pyPort = null;

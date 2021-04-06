@@ -133,4 +133,4 @@ Note: The backend must be built before the frontend. Building the electron app m
 The backend is built by [pyinstaller](https://www.pyinstaller.org/) and stored in backend/pyenginedist
 The frontend is built by [electron-packager](https://github.com/electron/electron-packager) and stored in the root directory at ace-darwin-x64 (mac) and ace-win32-x64(windows). The respective executable is found inside.
 
-NOTE: Once the backend is built in your directory (pyenginedist exists), it will use that bundled version as the backend. To run local API for development purposes, delete the packaged backend (pyenginedist).
+NOTE: Once the backend is built in your directory (pyenginedist exists), it will use that bundled version as the backend. To run local API for development purposes, delete the packaged backend (pyenginedist). The packaging process will also create a folder /backend/build and a file /backend/engine.spec. These can be deleted. 

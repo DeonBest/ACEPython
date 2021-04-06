@@ -212,8 +212,7 @@
 
     var ticker = null;
 
-    // On collection stop
-    $("#stopBtn").click(function () {
+    function onStop(){
       if (ticker != null) {
         fetch(`http://127.0.0.1:5000/stop/${reader}`)
           .then((response) => response.json)
@@ -223,6 +222,10 @@
         ticker.stop();
         hideActionImage();
       }
+    }
+    // On collection stop
+    $("#stopBtn").click(function () {
+      onStop();
     });
 
     // Do work initialization
@@ -245,13 +248,15 @@
             rep(int): current rep of action
     */
     function doWork(trial, action, rep) {
+      console.log("D", done, promptWindow);
       if (!done) {
         // If we are in delay between reps/actions, update the prompts
         if (Date.now() - start < countdownTimerms) {
           const progressToStart =
             ((Date.now() - start) / countdownTimerms) * 100;
           const untilStart = (countdownTimerms - (Date.now() - start)) / 1000;
-          if (promptWindow)
+          if (promptWindow){
+          console.log("DIN", done, promptWindow);
             promptWindow.webContents.send("message", {
               text: "Waiting",
               progress: {
@@ -260,6 +265,7 @@
               },
               image: collectionConfig.actions[action].key,
             });
+          }
           setActionImage(collectionConfig.actions[action].key);
         } else {
           // If we have collected data for the appropriate amount of time, save it and stop
@@ -382,6 +388,7 @@
               () => doWork(currentTrial, currentAction, currentRep),
               FRAME_SIZE
             );
+            start = Date.now();
             ticker.start();
           }
         });
@@ -463,6 +470,7 @@
                 },
               });
             }
+            onStop();
           }
         }
       }

@@ -176,10 +176,8 @@
     }
 
     var ticker = null;
-
-    // On collection stop
-    $("#stopBtn").click(function () {
-      if (ticker != null) {
+    function onStop(){
+       if (ticker != null) {
         fetch(`http://127.0.0.1:5000/stop/${reader}`)
           .then((response) => response.json)
           .then((result) => {
@@ -187,6 +185,10 @@
           });
         ticker.stop();
       }
+    }
+    // On collection stop
+    $("#stopBtn").click(function () {
+     onStop();
     });
 
     // Do work initialization
@@ -269,7 +271,8 @@
         })
         .catch((e) => {
           showToast("Read Error");
-          ticker.stop();
+          onStop();
+          
         });
     }
 
@@ -277,7 +280,6 @@
     fetch(`http://127.0.0.1:5000/start/${reader}`)
       .then((response) => response.json())
       .then((result) => {
-        console.log("start CALL", result);
         if (result == false) showToast("Error Starting Reader");
         else {
           ticker = new AdjustingInterval(doWork, FRAME_SIZE);

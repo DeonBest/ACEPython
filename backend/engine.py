@@ -198,6 +198,19 @@ def stopDAQ(daq):
     print('THE RESULT')
     return jsonify(result)
 
+"""
+/terminate
+
+This is called when the application closes. Clean up any open connections etc.
+"""
+
+
+@ app.route("/terminate")
+def terminate(daq):
+    print("TERMINATE DAQ")
+    result = DAQreader['delsys']['reader'].disconnect()
+    return jsonify(result)
+
 
 """
 /setfileinput/<file>

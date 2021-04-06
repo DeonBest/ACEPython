@@ -211,9 +211,8 @@ class DelsysReader(Reader):
             if 'OK' not in data:
                 print('Unable to stop data collection')
                 return False
-            else:
-                self.disconnect()
-                return True
+
+            return True
         except Exception as e:
             print(e)
             return False
