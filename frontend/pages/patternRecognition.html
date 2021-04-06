@@ -80,11 +80,9 @@
       });
 
       promptWindow.loadFile(__dirname + "/actionPrompt.html");
-      promptWindow.webContents.openDevTools();
     }
     else{ 
       promptWindow.loadFile(__dirname + "/actionPrompt.html");
-      promptWindow.webContents.openDevTools();
     }
     promptWindow.on('close', function() { //   <---- Catch close event
 

@@ -109,6 +109,12 @@ Data files that can be used as input can be stored in backend/data. They must be
 
 The list of actions is determined from the actions csv file in /backend/actions. The entries need corresponding images in the frontend/images/actions directory. To add an action, simply add an image to the directory and add its file name to the csv. The name that will be displayed in the dropdown will pulled from the file name, so keep naming consistent.
 
+## Debugging
+
+To debug the frontend, you can open chromium dev tools window. In main.js, mainWindow.webContents.openDevTools() opens the window, but only if you are running the application locally without it being bundled into a standalone application. If the backend has been built and pyenginedist folder is present in /backend, it will use the bundled API and considers this the released standalone version. If the application has been built already, you can delete the pyenginedist folder and it will run application under development. You can then use the dev tools window to see console logs, inspect elements, etc.
+
+To debug the backend, you can run `cd backend && python engine.py` to run the API in a terminal window before starting the application with `npm start`. All output from the python execution can be visible with from that terminal window. Once its running, you can also use any other script or postman to hit localhost:5000/ to test.
+
 ## Building
 
 To build a standalone Desktop app for this project.
@@ -126,3 +132,5 @@ Note: The backend must be built before the frontend. Building the electron app m
 
 The backend is built by [pyinstaller](https://www.pyinstaller.org/) and stored in backend/pyenginedist
 The frontend is built by [electron-packager](https://github.com/electron/electron-packager) and stored in the root directory at ace-darwin-x64 (mac) and ace-win32-x64(windows). The respective executable is found inside.
+
+NOTE: Once the backend is built in your directory (pyenginedist exists), it will use that bundled version as the backend. To run local API for development purposes, delete the packaged backend (pyenginedist).

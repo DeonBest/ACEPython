@@ -39,8 +39,9 @@ function createWindow() {
   // and load the index.html of the app.
   mainWindow.loadFile("frontend/pages/quickCollect.html");
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if (!guessPackaged())
+    // Open the DevTools.
+    mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on("closed", function () {
@@ -92,7 +93,7 @@ function createPyProc() {
   if (guessPackaged()) {
     pyProc = require("child_process").execFile(script, [port]);
   } else {
-    //pyProc = require('child_process').spawn('python', [script, port])
+    //pyProc = require('child_process').spawn('python', [script, port]) - used pythonshell instead
     PythonShell.run("backend/engine.py", null, function (err) {
       if (err) throw err;
     });
