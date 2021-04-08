@@ -1,0 +1,118 @@
+<!-- Channel Selector Component-->
+<!-- Author: Evan Larkin-->
+<!-- Date: March 2021-->
+<script type="text/javascript">
+  /*
+    Handle toggling of the enabled channels
+    Triggers appropriate plots to be displayed
+  */
+  function onChannelToggle(channel) {
+    switch (channel) {
+      case "all":
+        if ($(`#qc-all-channels`).attr("active") === "true") {
+          $("button[id^='qc-channel-']").removeClass("btn btn-primary");
+          $("button[id^='qc-channel-']").addClass("btn btn-secondary");
+          $("button[id^='qc-channel-']").attr("active", "false");
+        } else {
+          $("button[id^='qc-channel-']").removeClass("btn btn-secondary");
+          $("button[id^='qc-channel-']").addClass("btn btn-primary");
+          $("button[id^='qc-channel-']").attr("active", "true");
+        }
+        break;
+      default:
+        if ($(`#qc-channel-${channel}`).attr("active") === "true") {
+          $(`#qc-channel-${channel}`)
+            .toggleClass("btn btn-primary")
+            .toggleClass("btn btn-secondary")
+            .attr("active", "false");
+        } else {
+          $(`#qc-channel-${channel}`)
+            .toggleClass("btn btn-primary")
+            .toggleClass("btn btn-secondary")
+            .attr("active", "true");
+        }
+        break;
+    }
+  }
+</script>
+<button
+  type="button"
+  class="btn btn-primary"
+  id="qc-channel-1"
+  onclick="onChannelToggle(1)"
+  active="true"
+>
+  1
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="qc-channel-2"
+  onclick="onChannelToggle(2)"
+  active="false"
+>
+  2
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="qc-channel-3"
+  onclick="onChannelToggle(3)"
+  active="false"
+>
+  3
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="qc-channel-4"
+  onclick="onChannelToggle(4)"
+  active="false"
+>
+  4
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="qc-channel-5"
+  onclick="onChannelToggle(5)"
+  active="false"
+>
+  5
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="qc-channel-6"
+  onclick="onChannelToggle(6)"
+  active="false"
+>
+  6
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="qc-channel-7"
+  onclick="onChannelToggle(7)"
+  active="false"
+>
+  7
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="qc-channel-8"
+  onclick="onChannelToggle(8)"
+  active="false"
+>
+  8
+</button>
+<button
+  type="button"
+  class="btn btn-secondary"
+  id="qc-all-channels"
+  onclick="onChannelToggle('all')"
+  active="false"
+>
+  All
+</button>

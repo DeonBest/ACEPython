@@ -1,0 +1,492 @@
+<!-- Live Plot Component-->
+<!-- Author: Evan Larkin-->
+<!-- Date: March 2021-->
+<script type="text/javascript">
+  //Initialization
+  var currentTrial = 0,
+    currentAction = 0,
+    currentRep = 0,
+    i = 0;
+
+  // The number of data points on the plot at a time
+  const PLOT_POINTS = 1000;
+  // Data that will be displayed on the plots 8 x PLOT_POINTS
+  var chartdata = [[], [], [], [], [], [], [], []];
+  // Data from the collection 8 x N
+  var actiondata = [[], [], [], [], [], [], [], []];
+  // Labels required for the plot (x-axis). Equal to the data point number of the recording.
+  var labels = [];
+  // Data that will be used to calculate the feature. Reset every interval
+  var featuredata = [];
+  // Time (ms) between data fetches and plot update
+  var FRAME_SIZE = 100;
+
+  /* 
+    Set the image that overlays the charts
+    Args: imagePath(string) => path of the image in images/actions/
+  */
+  function setActionImage(imagePath) {
+    $(`#actionImagePlot`).attr("style", "display:block");
+    $("#actionImagePlot").attr(
+      "src",
+      `../../frontend/images/actions/${imagePath}`
+    );
+  }
+  /* 
+    Remove the image that overlays the charts
+  */
+  function hideActionImage() {
+    $(`#actionImagePlot`).attr("style", "display:none");
+  }
+  /* 
+    Is the configuration for collection valid?
+    Throws exception that when caught, will show toast with error message.
+  */
+  function validCollection() {
+    if (collectionConfig.actions.length <= 0) throw "No Actions Selected";
+    if ($("#input-select").val() == "Input") throw "No Input";
+  }
+
+  // Configuration of the chart (ChartJS: https://www.chartjs.org/)
+  var chartConfig = {
+    type: "line",
+    data: {
+      labels: new Array(500).fill(0),
+      datasets: [
+        {
+          data: [],
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "black",
+          fill: false,
+        },
+        {
+          data: [],
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "red",
+          fill: false,
+        },
+        {
+          data: [],
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "blue",
+          fill: false,
+        },
+        {
+          data: [],
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "orange",
+          fill: false,
+        },
+        {
+          data: [],
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "purple",
+          fill: false,
+        },
+        {
+          data: [],
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "cyan",
+          fill: false,
+        },
+        {
+          data: [],
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "green",
+          fill: false,
+        },
+        {
+          data: [],
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "pink",
+          fill: false,
+        },
+      ],
+    },
+    options: {
+      animation: {
+        duration: 0, // general animation time
+      },
+      elements: {
+        line: {
+          tension: 0, // disables bezier curves
+        },
+      },
+      hover: {
+        animationDuration: 0, // duration of animations when hovering an item
+      },
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+      layout: {
+        padding: {
+          left: 0,
+          right: 10,
+          top: 15,
+          bottom: 0,
+        },
+      },
+      responsiveAnimationDuration: 0, // animation duration after a resize
+      scales: {
+        xAxes: [
+          {
+            display: false,
+          },
+        ],
+        yAxes: [
+          {
+            display: true,
+            scaleLabel: {
+              display: true,
+            },
+            ticks: {
+              suggestedMin: -0.001,
+              suggestedMax: 0.001,
+            },
+          },
+        ],
+      },
+    },
+  };
+
+  // Apply charts to all the HTML below
+  ctx1 = document.getElementById("liveChart1");
+  var myLineChart1 = new Chart(ctx1, chartConfig);
+
+  /* 
+    On data collection start
+    Args: collect (boolean)=> Should we be collecting(saving) the data?
+  */
+  function onStart(collect) {
+    // Which channels are active (selected by the user)
+    let channels = 0;
+    let channelsActive = new Array(8).fill(false);
+
+    // Determine the reader selected
+    let reader = $("#daq-select").val();
+    if ($("#input-type-daq").is(":checked")) reader = $("#daq-select").val();
+    if ($("#input-type-file").is(":checked")) reader = "file";
+
+    /* 
+      This function is an accurate interval function, accounting for drift
+      Args: workFunc(function): a function that is called on every interval
+            interval(int): interval time (ms)
+            errorFunc(function): called when an error occurs during execution
+    */
+    function AdjustingInterval(workFunc, interval, errorFunc) {
+      var that = this;
+      var expected, timeout;
+      this.interval = interval;
+
+      this.start = function () {
+        expected = Date.now() + this.interval;
+        timeout = setTimeout(step, this.interval);
+      };
+
+      this.stop = function () {
+        clearTimeout(timeout);
+      };
+
+      function step() {
+        var drift = Date.now() - expected;
+        if (drift > that.interval) {
+          // You could have some default stuff here too...
+          if (errorFunc) errorFunc();
+        }
+        workFunc();
+        expected += that.interval;
+        timeout = setTimeout(step, Math.max(0, that.interval - drift));
+      }
+    }
+
+    var ticker = null;
+
+    function onStop(){
+      if (ticker != null) {
+        fetch(`http://127.0.0.1:5000/stop/${reader}`)
+          .then((response) => response.json)
+          .then((result) => {
+            if (!result) showToast("Error stopping reader");
+          });
+        ticker.stop();
+        hideActionImage();
+      }
+    }
+    // On collection stop
+    $("#stopBtn").click(function () {
+      onStop();
+    });
+
+    // Do work initialization
+    var currentIteration = 0,
+      frame = 0;
+    const featureFrame = ($("#time-step").val() * 1000) / FRAME_SIZE;
+
+    const ipcRenderer = require("electron").ipcRenderer;
+    const countdownTimerms = 3000;
+    const delayms = collectionConfig.delay * 1000;
+    const durationms = collectionConfig.duration * 1000;
+    const iterationLength = durationms / FRAME_SIZE; //How many iterations do we collect each action
+    var done = false,
+      collectionComplete = false;
+    let start = Date.now();
+    /* 
+      This function is passed to the interval function, ran every x ms
+      Args: trial(int): current trial of collection
+            action(int): current action of trial
+            rep(int): current rep of action
+    */
+    function doWork(trial, action, rep) {
+      console.log("D", done, promptWindow);
+      if (!done) {
+        // If we are in delay between reps/actions, update the prompts
+        if (Date.now() - start < countdownTimerms) {
+          const progressToStart =
+            ((Date.now() - start) / countdownTimerms) * 100;
+          const untilStart = (countdownTimerms - (Date.now() - start)) / 1000;
+          if (promptWindow){
+          console.log("DIN", done, promptWindow);
+            promptWindow.webContents.send("message", {
+              text: "Waiting",
+              progress: {
+                progress: parseInt(progressToStart),
+                text: `Starting in ${parseInt(untilStart) + 1}`,
+              },
+              image: collectionConfig.actions[action].key,
+            });
+          }
+          setActionImage(collectionConfig.actions[action].key);
+        } else {
+          // If we have collected data for the appropriate amount of time, save it and stop
+          if (currentIteration == iterationLength) {
+            done = true;
+            if (collect) appdata.trials[trial][action].reps.push(actiondata);
+            currentIteration = 0;
+            actiondata = [[], [], [], [], [], [], [], []];
+            ticker.stop();
+          }
+          // Update the prompt
+          const untilEnd =
+            ((Date.now() - (start + countdownTimerms)) / durationms) * 100;
+          if (promptWindow)
+            promptWindow.webContents.send("message", {
+              text: "Recording",
+              progress: {
+                progress: parseInt(untilEnd),
+                text: `Recording`,
+              },
+            });
+
+          // Fetch more data
+          fetch(`http://127.0.0.1:5000/read/${reader}`)
+            .then((response) => response.json())
+            .then((result) => {
+              // Check the channel selection
+              $('[id^="qc-channel-"]').each(function (i, el) {
+                if ($(this).attr("active") == "true") {
+                  channels++;
+                  channelsActive[i] = true;
+                  myLineChart1.data.datasets[i].hidden = false;
+                } else {
+                  channelsActive[i] = false;
+                  myLineChart1.data.datasets[i].hidden = true;
+                }
+              });
+
+              // Time to log the selected feature
+              if (frame % featureFrame == 0) {
+                onNewFeatureData(featuredata);
+                featuredata = [];
+              }
+
+              // Appen the data to the current collection
+              for (var j = 0; j <= 7; j++) {
+                actiondata[j] = actiondata[j].concat(result[j]);
+              }
+
+              //Format the data for plotting
+              try {
+                if (chartdata.length && result[0].length) {
+                  for (var n = 0; n < result[0].length; n++) {
+                    labels.push(i);
+                    if (labels.length > PLOT_POINTS) {
+                      labels.shift();
+                    }
+                    channelsActive.map((channelActive, channelInd) => {
+                      if (channelActive) {
+                        if (chartdata[channelInd].length > PLOT_POINTS) {
+                          chartdata[channelInd].shift();
+                        }
+
+                        chartdata[channelInd].push({
+                          x: i,
+                          y: result[channelInd][n] + 2 * channelInd,
+                        });
+                        featuredata.push(result[channelInd][n]);
+                      }
+                    });
+                    i++;
+                  }
+                }
+              } catch (e) {
+                console.log(e);
+              }
+              // Update the plot data for all active channels
+              myLineChart1.data.datasets[0].data = chartdata[0];
+              myLineChart1.data.datasets[1].data = chartdata[1];
+              myLineChart1.data.datasets[2].data = chartdata[2];
+              myLineChart1.data.datasets[3].data = chartdata[3];
+              myLineChart1.data.datasets[4].data = chartdata[4];
+              myLineChart1.data.datasets[5].data = chartdata[5];
+              myLineChart1.data.datasets[6].data = chartdata[6];
+              myLineChart1.data.datasets[7].data = chartdata[7];
+              myLineChart1.data.labels = labels;
+              myLineChart1.update();
+              currentIteration++;
+              frame++;
+            })
+            .catch(() => {
+              showToast("Read Error");
+              ticker.stop();
+            });
+        }
+      }
+    }
+
+    // START COLLECTION
+    try {
+      // Is the collection valid (throws error otherwise)
+      validCollection();
+      // Initialize Collection Data
+      var repCount = collectionConfig.actions[currentAction].reps;
+      var trialCount = collectionConfig.trials;
+      if (collect) {
+        appdata.trials.push([]);
+        appdata.trials[currentTrial].push({
+          name: collectionConfig.actions[0].name,
+          reps: [],
+        });
+      }
+      // Start the reader to prepare for collection
+      fetch(`http://127.0.0.1:5000/start/${reader}`)
+        .then((response) => response.json())
+        .then((result) => {
+          if (result == false) showToast("Error Starting Reader");
+          else {
+            ticker = new AdjustingInterval(
+              () => doWork(currentTrial, currentAction, currentRep),
+              FRAME_SIZE
+            );
+            start = Date.now();
+            ticker.start();
+          }
+        });
+
+      /*
+        This function manages the collection process, it continues to check if 
+        collection of the rep is complete and updates the prompt.
+        When the rep is complete, it sets the trial/action/rep according to the congifuration, and 
+        re-starts collection of the appropriate rep.
+        When the total collection is complete, it updates the prompt stops collection
+      */
+      function checkFlag() {
+        if (done == false) {
+          setTimeout(checkFlag, FRAME_SIZE);
+        } else {
+          setStatus(collectionConfig.actions[currentAction].key, true, 0);
+          currentRep++;
+          if (currentRep % repCount == 0 && currentRep != 0) {
+            currentRep = 0;
+            currentAction++;
+            if (
+              currentAction % collectionConfig.actions.length == 0 &&
+              currentAction != 0
+            ) {
+              currentAction = 0;
+              currentTrial++;
+              if (currentTrial % trialCount == 0 && currentTrial != 0) {
+                collectionComplete = true;
+                ticker.stop();
+              } else {
+                if (collect) {
+                  appdata.trials.push([]);
+                  appdata.trials[currentTrial].push({
+                    name: collectionConfig.actions[0].name,
+                    reps: [],
+                  });
+                }
+                repCount = collectionConfig.actions[0].reps;
+              }
+            } else {
+              if (collect)
+                appdata.trials[currentTrial].push({
+                  name: collectionConfig.actions[currentAction].name,
+                  reps: [],
+                });
+              repCount = collectionConfig.actions[currentAction].reps;
+            }
+          } else {
+            //currentRep++;
+          }
+
+          if (!collectionComplete) {
+            ticker.stop();
+            start = Date.now();
+            done = false;
+            ticker = new AdjustingInterval(
+              () => doWork(currentTrial, currentAction, currentRep),
+              FRAME_SIZE
+            );
+            ticker.start();
+            setTimeout(checkFlag, FRAME_SIZE);
+          } else {
+            // DONE
+
+            // Reset indexes if data not recorded
+            if (!collect) {
+              (currentTrial = 0),
+                (currentAction = 0),
+                (currentRep = 0),
+                (currentIteration = 0),
+                (frame = 0);
+            }
+            if (promptWindow) {
+              promptWindow.webContents.send("message", {
+                text: "Done",
+                progress: {
+                  progress: parseInt(100),
+                  text: `Done`,
+                },
+              });
+            }
+            onStop();
+          }
+        }
+      }
+      checkFlag();
+    } catch (e) {
+      showToast(e);
+    }
+  }
+</script>
+
+<div style="position: relative">
+  <img
+    id="actionImagePlot"
+    src="../../frontend/images/actions/key_grip.jpg"
+    style="display: none"
+  />
+
+  <canvas id="liveChart1"></canvas>
+</div>

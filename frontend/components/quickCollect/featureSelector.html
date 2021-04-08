@@ -1,0 +1,37 @@
+<!-- Feature Selection-->
+<!-- Author: Evan Larkin-->
+<!-- Date: March 2021-->
+<script type="text/javascript">
+  $(function () {
+    // Populate drop down with the features defined in javascript/features
+    setTimeout(() => {
+      features.forEach((feature, index) => {
+        $("#feature-select").append(
+          $("<option>", {
+            value: feature.function,
+            text: feature.name,
+          })
+        );
+      });
+    }, 1000);
+  });
+</script>
+<div>Feature</div>
+<div>
+  <select
+    id="feature-select"
+    class="form-select"
+    aria-label="Default select example"
+  >
+    <option>None</option>
+  </select>
+</div>
+<div>Time Step</div>
+<div>
+  <input
+    type="number"
+    class="form-control"
+    id="time-step"
+    aria-describedby="timeStepIn"
+  />
+</div>

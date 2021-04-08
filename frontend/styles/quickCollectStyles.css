@@ -1,0 +1,19 @@
+.window {
+  top: 60px; /* Header Height */
+  bottom: 10px; /* Footer Height */
+  width: 100%;
+}
+
+.col {
+  min-width: 0;
+}
+
+.container {
+  display: flex;
+  max-width: 90%;
+  margin: 5px;
+  flex: 1;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}

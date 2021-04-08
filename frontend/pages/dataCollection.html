@@ -1,0 +1,94 @@
+<script type="text/javascript">
+    $(function () {
+       /*
+            Add in components
+          */
+      $("#navigation").load("../components/common/navbar.html");
+      $("#chart").load("../components/patternRecognition/livePlot.html");
+      $("#channels").load("../components/common/channelSelector.html");
+      $('#inputTypeContainer').load("../components/common/inputTypeSelector.html")
+      $('#actionContainer').load("../components/patternRecognition/actionSelector.html")
+      $('#collectionSettings').load("../components/patternRecognition/collectionSettings.html")
+      $('#promptView').load("../components/patternRecognition/promptView.html")
+      $("#toast").load("../components/common/toast.html");
+    });
+    var collected = false;
+    function collect(){
+        onOpenPrompt();
+        onStart(true);
+        collected = true;
+
+    }
+    function preview(){
+      onOpenPrompt();
+      onStart(false);
+    }
+  </script>
+  
+<div>
+
+<div class="row">
+    <div class="col" id="chart">
+      <div id="chart"></div>
+    </div>
+    <div class="col">
+      <div id='actionContainer'></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6">
+      <div>
+        <h4>Stream</h4>
+      </div>
+      <div class='streamContainer'>
+  
+        <button type="button" class="btn btn-secondary" onclick="onStart(true)">Record</button>
+        <button type="button" class="btn btn-secondary" onclick="onStart(false)">
+          Start
+        </button>
+        <button type="button" class="btn btn-secondary" id="stopBtn">
+          Stop
+        </button>
+      </div>
+    </div>
+    <div class="col-3">
+      <div id ='collectionSettings'></div>
+    </div>
+    <div class="col-3">
+      <div>
+      <h4>Prompt View</h4>
+    </div>
+      <div id=promptView>
+      
+      </div>
+      <div style='display:flex;justify-content: center;'>
+            <button style="width: 50%; margin-bottom: 5px" onclick="collect()">
+        Collect</button>
+      </div>
+    
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6" >
+
+      <div>
+        <h4>Channels</h4>
+      </div>
+      <div class="streamContainer" id="channels"></div>
+    </div>
+    <div class="col-3">
+
+    </div>
+    <div class="col-3">
+      <div>
+        <h4>Input Type</h4>
+      </div>
+      <div class="inputTypeContainer">
+     <div id="inputTypeContainer"></div>
+      </div>
+
+        </div>
+    </div>
+    </div>
+    <div id='toast'></div>
+  </div>

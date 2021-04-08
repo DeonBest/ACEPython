@@ -1,0 +1,185 @@
+<!-- Action Selector Component-->
+<!-- Author: Evan Larkin-->
+<!-- Date: February 2021-->
+<!-- Usage Notes: Pulls actions from the list images-->
+<style>
+  .action-list-item {
+    display: flex;
+    flex-direction: row;
+  }
+  .action-list-field-sm {
+    flex: 0.1;
+  }
+  .action-list-field-md {
+    flex: 2;
+  }
+  .action-list-field-lg {
+    flex: 3;
+    padding-left: 5px;
+  }
+  input[type="number"] {
+    width: 80px;
+  }
+</style>
+<script>
+  let actions = [];
+  function handleSetAllReps() {
+    const reps = parseInt(document.getElementById(`action-reps-all`).value);
+    actions.forEach((action) =>
+      handleRepsChange(action.action_key, action.action_name, reps)
+    );
+    var inputs = $('[id^="action-reps-"]');
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].value = reps;
+      reps;
+    }
+  }
+
+  function handleSelectAll() {
+    actions.forEach((action) => {
+      // if unchecked, add it
+      var checked = document.getElementById(action.action_key).checked;
+      if (checked) handleActionSelection(action.action_key, action.action_name);
+      //$(`${action.action_key}`).prop("checked", true);
+    });
+    $(`.action_checkbox`).prop("checked", true);
+  }
+
+  function setStatus(key, increment, value) {
+    if (increment) {
+      let val = parseInt(
+        document.getElementById(`action-status-${key}`).innerHTML
+      );
+      val++;
+      document.getElementById(`action-status-${key}`).innerHTML = val;
+    } else {
+      document.getElementById(`action-status-${key}`).innerHTML = value;
+    }
+  }
+  function handleRepsChange(actionKey, actionName, repsIn) {
+    var reps = parseInt(
+      document.getElementById(`action-reps-${actionKey}`).value
+    );
+    // Optional param receives valuem used with set all option
+    if (repsIn != null) {
+      reps = repsIn;
+    }
+    // If already added to list of actions, update its reps, otherwise ignore
+    var actions = collectionConfig.actions;
+    if (actions.some((action) => action.name === actionName)) {
+      var actions = collectionConfig.actions;
+      actions = actions.map((action) => {
+        if (action.name === actionName) {
+          return { ...action, reps };
+        }
+        return action;
+      });
+      collectionConfig.actions = actions;
+    }
+  }
+  function handleActionSelection(actionKey, actionName) {
+    const checked = document.getElementById(actionKey).checked;
+
+    const reps = parseInt(
+      document.getElementById(`action-reps-${actionKey}`).value
+    );
+    var actions = collectionConfig.actions;
+    if (actions.some((action) => action.name === actionName)) {
+      actions = actions.filter(function (action) {
+        return action.name !== actionName;
+      });
+    } else {
+      if (reps == 0) {
+        document.getElementById(`action-reps-${actionKey}`).value = 1;
+      }
+      actions.push({
+        name: actionName,
+        key: actionKey,
+        reps: reps == 0 ? 1 : reps,
+      });
+    }
+    collectionConfig.actions = actions;
+  }
+  $(function () {
+    fetch("http://127.0.0.1:5000/actions")
+      .then((response) => response.json())
+      .then((result) => {
+        actions = result;
+        result.map((action) => {
+          $("#list").append(`
+              <li class="list-group-item">
+                <div class="action-list-item">
+                  <div class="action-list-field-sm">
+                    <input
+                      type="checkbox"
+                      onclick="handleActionSelection('${action.action_key}','${action.action_name}')"
+                      id="${action.action_key}"
+                      class="action_checkbox"
+                    />
+                  </div>
+                  <div class="action-list-field-lg">${action.action_name}</div>
+                  <div class="action-list-field-md">
+                    <input
+                      type="number"
+                      class="form-control form-control-sm"
+                      value=0
+                      id="action-reps-${action.action_key}"
+                      aria-describedby="repsIn"
+                      onchange="handleRepsChange('${action.action_key}','${action.action_name}')"
+                    />
+                  </div>
+                  <div class="action-list-field-md">
+                    <div
+                      style="display:flex;justify-content:center"
+                      type="number"
+                      id="action-status-${action.action_key}"
+                      aria-describedby="actionStatus"
+
+                      >
+0
+                    </div>
+                  </div>
+                </div>
+              </li>
+        `);
+        });
+      });
+  });
+</script>
+<ul class="list-group" id="list" style="max-height: 40vh; overflow-y: scroll">
+  <li class="list-group-item">
+    <div class="action-list-item">
+      <div class="action-list-field-sm"></div>
+      <div class="action-list-field-lg">Action</div>
+      <div class="action-list-field-md">
+        <div style="padding-left: 20px">Reps</div>
+      </div>
+      <div class="action-list-field-md">
+        <div style="display: flex; justify-content: center">Status</div>
+      </div>
+    </div>
+  </li>
+</ul>
+<div class="action-list-item">
+  <div class="action-list-field-sm"></div>
+  <div class="action-list-field-lg">
+    <div style="align-items: center; display: flex; margin: 5px">
+      <button onclick="handleSelectAll()">Select All</button>
+    </div>
+  </div>
+  <div class="action-list-field-md">
+    <div style="display: flex; align-items: center">
+      Set All
+      <input
+        type="number"
+        class="form-control form-control-sm"
+        value="0"
+        id="action-reps-all"
+        aria-describedby="repsIn"
+        onchange="handleSetAllReps()"
+        style="margin: 5px"
+      />
+    </div>
+  </div>
+  <div class="action-list-field-md"></div>
+</div>

@@ -1,0 +1,94 @@
+<!-- Feature Plot-->
+<!-- Author: Evan Larkin-->
+<!-- Date: March 2021-->
+<script type="text/javascript">
+  // Data currently on the plot
+  var plotdata = [];
+  // Label data (x-axis). Equal to the data point number
+  var labeldata = [];
+  // Load chart into the HTML below
+  ctx = document.getElementById("featurePlot");
+  var myFeaturePlot = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: new Array(500).fill(0),
+      datasets: [
+        {
+          data: plotdata,
+          pointRadius: 0,
+          borderWidth: 1,
+          borderColor: "black",
+          fill: false,
+        },
+      ],
+    },
+    options: {
+      animation: {
+        duration: 0, // general animation time
+      },
+      elements: {
+        line: {
+          tension: 0, // disables bezier curves
+        },
+      },
+      hover: {
+        animationDuration: 0, // duration of animations when hovering an item
+      },
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+      layout: {
+        padding: {
+          bottom: 30,
+        },
+      },
+      responsiveAnimationDuration: 0, // animation duration after a resize
+      scales: {
+        xAxes: [
+          {
+            display: false,
+          },
+        ],
+        yAxes: [
+          {
+            display: true,
+            scaleLabel: {
+              display: true,
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  function average(array) {
+    return (average = (array) =>
+      array.reduce((a, b) => a + b, 0) / array.length);
+  }
+
+  /*
+    This function checks the current feature selection, computes its value
+    and adds the new value to the plot. Triggered in livePlot.js.
+    Args: data(array)=> data that is used to calculate the feature value
+  */
+  function onNewFeatureData(data) {
+    if ($("#feature-select option:selected").text() !== "None" && data.length) {
+      const featureFunction = features.find(
+        (feature) => feature.name == $("#feature-select option:selected").text()
+      );
+      if (featureFunction) {
+        plotdata.push(featureFunction.calculate(data));
+        labeldata.push([...plotdata.keys()]);
+        myFeaturePlot.data.datasets[0].data = plotdata;
+        myFeaturePlot.data.labels = labeldata;
+        myFeaturePlot.update();
+      } else {
+        showToast("Error finding feature function");
+      }
+    }
+  }
+</script>
+<canvas id="featurePlot"></canvas>
